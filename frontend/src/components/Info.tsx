@@ -19,7 +19,7 @@ const Info = React.forwardRef<HTMLButtonElement, InfoProps>(({ isCollapsed }, re
               ? "bg-transparent p-2 hover:bg-muted rounded-lg"
               : "w-full px-3 py-1.5 mt-1 text-sm font-medium text-foreground bg-secondary hover:bg-secondary/80 rounded-lg shadow-sm"
           }`}
-          title="About Meetily"
+          title="About Nota"
         >
           <InfoIcon className={`text-muted-foreground ${isCollapsed ? "w-5 h-5" : "w-4 h-4"}`} />
           {!isCollapsed && (
@@ -29,7 +29,7 @@ const Info = React.forwardRef<HTMLButtonElement, InfoProps>(({ isCollapsed }, re
       </DialogTrigger>
       <DialogContent>
         <VisuallyHidden>
-          <DialogTitle>About Meetily</DialogTitle>
+          <DialogTitle>About Nota</DialogTitle>
         </VisuallyHidden>
         <About />
       </DialogContent>

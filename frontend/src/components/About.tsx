@@ -23,7 +23,7 @@ export function About() {
 
     const handleContactClick = async () => {
         try {
-            await invoke('open_external_url', { url: 'https://meetily.zackriya.com/#about' });
+            await invoke('open_external_url', { url: 'https://nota.app/#about' });
         } catch (error) {
             console.error('Failed to open link:', error);
         }
@@ -54,13 +54,13 @@ export function About() {
                 <div className="mb-3">
                     <Image
                         src="icon_128x128.png"
-                        alt="Meetily Logo"
+                        alt="Nota Logo"
                         width={64}
                         height={64}
                         className="mx-auto"
                     />
                 </div>
-                {/* <h1 className="text-xl font-bold text-foreground">Meetily</h1> */}
+                {/* <h1 className="text-xl font-bold text-foreground">Nota</h1> */}
                 <span className="text-sm text-muted-foreground"> v{currentVersion}</span>
                 <p className="text-medium text-muted-foreground mt-1">
                     Real-time notes and summaries that never leave your machine.
@@ -95,7 +95,7 @@ export function About() {
 
             {/* Features Grid - Compact */}
             <div className="space-y-3">
-                <h2 className="text-base font-semibold text-foreground">What makes Meetily different</h2>
+                <h2 className="text-base font-semibold text-foreground">What makes Nota different</h2>
                 <div className="grid grid-cols-2 gap-2">
                     <div className="bg-muted rounded p-3 hover:bg-muted/80 transition-colors">
                         <h3 className="font-bold text-sm text-foreground mb-1">Privacy-first</h3>

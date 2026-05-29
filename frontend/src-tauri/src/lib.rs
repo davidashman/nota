@@ -423,7 +423,7 @@ pub fn run() {
                 let settings_item = IconMenuItemBuilder::with_id("app_settings", "Settings...")
                     .accelerator("Cmd+,")
                     .build(&h)?;
-                let app_submenu = SubmenuBuilder::new(&h, "Meetily")
+                let app_submenu = SubmenuBuilder::new(&h, "Nota")
                     .about(None)
                     .separator()
                     .item(&settings_item)
@@ -856,7 +856,7 @@ unsafe fn set_settings_menu_icon_sf_symbol() {
     if main_menu.is_null() {
         return;
     }
-    // Index 0 is the app (Meetily) menu
+    // Index 0 is the app (Nota) menu
     let app_item: *mut AnyObject = msg_send![main_menu, itemAtIndex: 0isize];
     if app_item.is_null() {
         return;

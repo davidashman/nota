@@ -66,19 +66,19 @@ try {
 
 // Re-sign the macOS bundle with a stable identifier.
 // The linker-generated adhoc signature uses a hash-suffixed identifier (e.g.
-// `meetily-2dbe4a5ed93c9bc6`) that changes every build. macOS's TCC database
+// `nota-2dbe4a5ed93c9bc6`) that changes every build. macOS's TCC database
 // keys permissions on that identifier, so without this step users get
 // re-prompted for mic/notifications on every rebuild.
 if (command === 'build' && platform === 'darwin') {
-  const appPath = path.resolve(__dirname, '..', '..', 'target', 'release', 'bundle', 'macos', 'meetily.app');
+  const appPath = path.resolve(__dirname, '..', '..', 'target', 'release', 'bundle', 'macos', 'Nota.app');
   const entitlementsPath = path.resolve(__dirname, '..', 'src-tauri', 'entitlements.plist');
 
   if (fs.existsSync(appPath)) {
     console.log('');
-    console.log(`🔏 Re-signing ${appPath} with stable identifier (com.meetily.ai)`);
+    console.log(`🔏 Re-signing ${appPath} with stable identifier (app.nota)`);
     try {
       execSync(
-        `codesign --force --sign - --identifier com.meetily.ai ` +
+        `codesign --force --sign - --identifier app.nota ` +
           `--entitlements "${entitlementsPath}" --options runtime --deep ` +
           `"${appPath}"`,
         { stdio: 'inherit' }

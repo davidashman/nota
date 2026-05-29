@@ -68,7 +68,7 @@ export function PermissionsStep() {
   return (
     <OnboardingContainer
       title="Grant Permissions"
-      description="Meetily needs access to your microphone and system audio to record meetings"
+      description="Nota needs access to your microphone and system audio to capture meetings"
       step={4}
       hideProgress={true}
       showNavigation={allPermissionsGranted}

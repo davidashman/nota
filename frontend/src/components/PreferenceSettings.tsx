@@ -23,7 +23,7 @@ export function PreferenceSettings() {
       <div className="bg-card rounded-lg border border-border p-6 shadow-sm">
         <h3 className="text-lg font-semibold text-foreground mb-4">Data Storage Locations</h3>
         <p className="text-sm text-muted-foreground mb-6">
-          View where Meetily stores your data
+          View where Nota stores your data
         </p>
 
         <div className="space-y-4">

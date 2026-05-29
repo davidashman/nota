@@ -14,7 +14,7 @@ const Logo = React.forwardRef<HTMLDivElement, React.HTMLAttributes<HTMLDivElemen
   return (
     <div ref={ref} {...props} className="flex items-center gap-2 mb-2">
       <WaveformMark />
-      <span className="text-[15px] font-semibold tracking-[-0.2px] text-foreground">meetily</span>
+      <span className="text-[15px] font-semibold tracking-[-0.2px] text-foreground">Nota</span>
     </div>
   );
 });

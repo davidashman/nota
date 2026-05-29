@@ -249,15 +249,15 @@ export const VirtualizedTranscriptView: React.FC<VirtualizedTranscriptViewProps>
                                 <div className={`w-3 h-3 rounded-full ${isPaused ? 'bg-orange-500' : 'bg-blue-500 animate-pulse'}`}></div>
                             </div>
                             <p className="text-sm text-gray-600">
-                                {isPaused ? 'Recording paused' : 'Listening for speech...'}
+                                {isPaused ? 'Paused' : 'Listening for speech...'}
                             </p>
                             <p className="text-xs mt-1 text-gray-400">
-                                {isPaused ? 'Click resume to continue recording' : 'Speak to see live transcription'}
+                                {isPaused ? 'Click resume to continue listening' : 'Speak to see live transcription'}
                             </p>
                         </>
                     ) : (
                         <>
-                            <div className="flex justify-center mb-5">
+                            <div className="flex justify-center mb-4">
                                 <svg width="56" height="56" viewBox="0 0 24 24" fill="none" aria-hidden="true" className="text-blue-500">
                                     <rect x="0"  y="9"  width="3" height="6"  rx="1.5" fill="currentColor"/>
                                     <rect x="5"  y="5"  width="3" height="14" rx="1.5" fill="currentColor"/>
@@ -266,7 +266,7 @@ export const VirtualizedTranscriptView: React.FC<VirtualizedTranscriptViewProps>
                                     <rect x="20" y="9"  width="3" height="6"  rx="1.5" fill="currentColor"/>
                                 </svg>
                             </div>
-                            <p className="text-3xl font-bold tracking-tight">Welcome to meetily!</p>
+                            <p className="text-lg font-semibold text-gray-200">Nota</p>
                             <p className="text-base mt-3 text-gray-400">Start listening to see live transcription</p>
                         </>
                     )}

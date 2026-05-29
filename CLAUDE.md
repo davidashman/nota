@@ -4,7 +4,7 @@ This file provides guidance to Claude Code (claude.ai/code) when working with co
 
 ## Project Overview
 
-**Meetily** is a privacy-first AI meeting assistant that captures, transcribes, and summarizes meetings entirely on local infrastructure. The project consists of two main components:
+**Nota** is a privacy-first AI transcription and summarization app that captures, transcribes, and summarizes meetings entirely on local infrastructure. The project consists of two main components:
 
 1. **Frontend**: Tauri-based desktop application (Rust + Next.js + TypeScript)
 2. **Backend**: FastAPI server for meeting storage and LLM-based summarization (Python)

@@ -216,7 +216,7 @@ mod macos {
     // Public surface
     // ---------------------------------------------------------------------------
 
-    const MEETILY_BUNDLE_ID: &str = "com.meetily.ai";
+    const NOTA_BUNDLE_ID: &str = "app.nota";
     const MEETING_END_DEBOUNCE_MS: u64 = 3_000;
     const FALLBACK_PID: i32 = -1;
 
@@ -364,7 +364,7 @@ mod macos {
             );
 
             // Skip ourselves.
-            if bundle_id.as_deref() == Some(MEETILY_BUNDLE_ID) {
+            if bundle_id.as_deref() == Some(NOTA_BUNDLE_ID) {
                 log::info!("[auto-detect] skipping own PID {}", pid);
                 continue;
             }

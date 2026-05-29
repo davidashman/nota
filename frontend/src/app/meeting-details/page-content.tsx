@@ -176,7 +176,7 @@ export default function PageContent({
       className="flex flex-col h-screen bg-background"
     >
       {/* Tab bar */}
-      <div className="flex items-center justify-between px-4 py-2 border-b border-border shrink-0">
+      <div data-tauri-drag-region className="flex items-center justify-between px-4 py-2 border-b border-border shrink-0">
         <Tabs value={activeTab} onValueChange={(v) => setActiveTab(v as 'transcript' | 'summary' | 'analysis')}>
           <TabsList className="h-7">
             <TabsTrigger value="transcript" className="text-xs px-3 h-6">Transcript</TabsTrigger>
