@@ -28,7 +28,7 @@ export function PreferenceSettings() {
   };
 
   return (
-    <div className="space-y-6">
+    <div className="flex flex-col gap-4 mb-6">
       {/* Dark Mode */}
       <div className="bg-card rounded-lg border border-border p-6 shadow-sm">
         <div className="flex items-center justify-between">

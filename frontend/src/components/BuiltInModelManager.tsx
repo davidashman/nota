@@ -296,7 +296,7 @@ export function BuiltInModelManager({ selectedModel, onModelSelect }: BuiltInMod
                     <span className="text-base font-bold text-foreground">{model.display_name || model.name}</span>
                     {isAvailable && (
                       <>
-                        <span className="text-xs text-green-500 font-medium flex items-center gap-1">
+                        <span className="text-xs text-green-500 font-medium flex items-center gap-1 pl-2">
                           <span className="w-2 h-2 rounded-full bg-green-500"></span>
                           Ready
                         </span>

@@ -16,7 +16,7 @@ import { Tabs, TabsList, TabsTrigger, TabsContent } from '@/components/ui/tabs';
 // Tabs configuration (constant)
 const TABS = [
   { value: 'general', label: 'General', icon: Settings2 },
-  { value: 'recording', label: 'Listening', icon: Mic },
+  { value: 'recording', label: 'Audio', icon: Mic },
   { value: 'Transcriptionmodels', label: 'Transcription', icon: DatabaseIcon },
   { value: 'summaryModels', label: 'Analysis', icon: SparkleIcon },
   { value: 'beta', label: 'Beta', icon: FlaskConical },
@@ -65,7 +65,7 @@ export default function SettingsPage() {
   return (
     <div className="h-screen bg-background flex flex-col">
       {/* Fixed Header */}
-      <div className="sticky top-0 z-10 bg-background border-b border-border">
+      <div className="bg-background border-b border-border">
         <div className="max-w-6xl mx-auto px-8 py-6">
           <div className="flex items-center gap-4">
             <button
@@ -80,12 +80,11 @@ export default function SettingsPage() {
         </div>
       </div>
 
-      {/* Scrollable Content */}
-      <div className="flex-1 overflow-y-auto">
-        <div className="max-w-6xl mx-auto p-8 pt-6">
-          {/* Tabs */}
-          <Tabs value={activeTab} onValueChange={setActiveTab}>
-            <TabsList className="bg-transparent relative rounded-none border-b border-border p-0 h-auto">
+      <Tabs value={activeTab} onValueChange={setActiveTab} className="flex-1 flex flex-col min-h-0">
+        {/* Fixed Tabs */}
+        <div className="bg-background border-b border-border shrink-0">
+          <div className="max-w-6xl mx-auto px-8">
+            <TabsList className="bg-transparent relative rounded-none border-0 p-0 h-auto">
               {TABS.map((tab, index) => {
                 const Icon = tab.icon;
                 return (
@@ -108,7 +107,12 @@ export default function SettingsPage() {
                 transition={{ type: 'spring', stiffness: 400, damping: 40 }}
               />
             </TabsList>
+          </div>
+        </div>
 
+        {/* Scrollable Panel Content */}
+        <div className="flex-1 overflow-y-auto">
+          <div className="max-w-6xl mx-auto p-8 pt-6">
             <TabsContent value="general">
               <PreferenceSettings />
             </TabsContent>
@@ -124,12 +128,12 @@ export default function SettingsPage() {
             <TabsContent value="summaryModels">
               <SummaryModelSettings />
             </TabsContent>
-            <TabsContent value="beta" className="mt-6">
+            {/* <TabsContent value="beta" className="mt-6">
               <BetaSettings />
-            </TabsContent>
-          </Tabs>
+            </TabsContent> */}
+          </div>
         </div>
-      </div>
+      </Tabs>
     </div>
   );
 };

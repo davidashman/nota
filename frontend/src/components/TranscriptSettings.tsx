@@ -4,9 +4,14 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '.
 import { Input } from './ui/input';
 import { Button } from './ui/button';
 import { Label } from './ui/label';
-import { Eye, EyeOff, Lock, Unlock } from 'lucide-react';
+import { Eye, EyeOff, Lock, Unlock, X, Plus } from 'lucide-react';
 import { ModelManager } from './WhisperModelManager';
 import { ParakeetModelManager } from './ParakeetModelManager';
+
+interface AutoRecordApp {
+    bundle_id: string;
+    display_name: string;
+}
 
 
 export interface TranscriptModelProps {
@@ -27,6 +32,9 @@ export function TranscriptSettings({ transcriptModelConfig, setTranscriptModelCo
     const [isApiKeyLocked, setIsApiKeyLocked] = useState<boolean>(true);
     const [isLockButtonVibrating, setIsLockButtonVibrating] = useState<boolean>(false);
     const [uiProvider, setUiProvider] = useState<TranscriptModelProps['provider']>(transcriptModelConfig.provider);
+    const [autoRecordApps, setAutoRecordApps] = useState<AutoRecordApp[]>([]);
+    const [savingApps, setSavingApps] = useState(false);
+    const [addingApp, setAddingApp] = useState(false);
 
     // Sync uiProvider when backend config changes (e.g., after model selection or initial load)
     useEffect(() => {
@@ -38,6 +46,52 @@ export function TranscriptSettings({ transcriptModelConfig, setTranscriptModelCo
             setApiKey(null);
         }
     }, [transcriptModelConfig.provider]);
+
+    useEffect(() => {
+        const loadApps = async () => {
+            try {
+                const prefs = await invoke<{ auto_record_apps: AutoRecordApp[] }>('get_recording_preferences');
+                setAutoRecordApps(prefs.auto_record_apps ?? []);
+            } catch (error) {
+                console.error('Failed to load auto-transcription apps:', error);
+            }
+        };
+        loadApps();
+    }, []);
+
+    const saveAutoRecordApps = async (apps: AutoRecordApp[]) => {
+        setSavingApps(true);
+        try {
+            const prefs = await invoke<{ preferred_mic_device: string | null; preferred_system_device: string | null; auto_record_apps: AutoRecordApp[] }>('get_recording_preferences');
+            await invoke('set_recording_preferences', { preferences: { ...prefs, auto_record_apps: apps } });
+        } catch (error) {
+            console.error('Failed to save auto-transcription apps:', error);
+        } finally {
+            setSavingApps(false);
+        }
+    };
+
+    const handleAddApp = async () => {
+        setAddingApp(true);
+        try {
+            const picked = await invoke<AutoRecordApp | null>('pick_application_for_auto_record');
+            if (!picked) return;
+            if (autoRecordApps.some((a) => a.bundle_id === picked.bundle_id)) return;
+            const updated = [...autoRecordApps, picked];
+            setAutoRecordApps(updated);
+            await saveAutoRecordApps(updated);
+        } catch (error) {
+            console.error('Failed to pick app:', error);
+        } finally {
+            setAddingApp(false);
+        }
+    };
+
+    const handleRemoveApp = async (bundleId: string) => {
+        const updated = autoRecordApps.filter((a) => a.bundle_id !== bundleId);
+        setAutoRecordApps(updated);
+        await saveAutoRecordApps(updated);
+    };
 
     const fetchApiKey = async (provider: string) => {
         try {
@@ -96,12 +150,59 @@ export function TranscriptSettings({ transcriptModelConfig, setTranscriptModelCo
     };
 
     return (
-        <div>
-            <div>
-                {/* <div className="flex justify-between items-center mb-4">
-                    <h3 className="text-lg font-semibold text-gray-900">Transcript Settings</h3>
-                </div> */}
-                <div className="space-y-4 pb-6">
+        <div className="flex flex-col gap-4 mb-6">
+            <div className="bg-card rounded-lg border border-border p-6 shadow-sm">
+                <h3 className="text-lg font-semibold text-foreground mb-2">Auto-Transcription Apps</h3>
+                <p className="text-sm text-muted-foreground mb-4">
+                    Transcription starts immediately when these apps take the microphone — no countdown prompt.
+                </p>
+
+                <div className="border border-border rounded-lg overflow-hidden">
+                    {autoRecordApps.length === 0 ? (
+                        <p className="text-sm text-muted-foreground px-4 py-3">
+                            No apps configured. Click "Add App" to get started.
+                        </p>
+                    ) : (
+                        <ul className="divide-y divide-border">
+                            {autoRecordApps.map((app) => (
+                                <li
+                                    key={app.bundle_id}
+                                    className="flex items-center justify-between px-4 py-2"
+                                >
+                                    <div>
+                                        <span className="text-sm font-medium">{app.display_name}</span>
+                                        <span className="text-xs text-muted-foreground ml-2">{app.bundle_id}</span>
+                                    </div>
+                                    <Button
+                                        variant="ghost"
+                                        size="sm"
+                                        className="h-7 w-7 p-0 text-muted-foreground hover:text-destructive"
+                                        onClick={() => handleRemoveApp(app.bundle_id)}
+                                        disabled={savingApps}
+                                    >
+                                        <X className="h-4 w-4" />
+                                    </Button>
+                                </li>
+                            ))}
+                        </ul>
+                    )}
+                </div>
+
+                <Button
+                    variant="outline"
+                    size="sm"
+                    className="mt-3"
+                    onClick={handleAddApp}
+                    disabled={addingApp || savingApps}
+                >
+                    <Plus className="h-4 w-4 mr-1" />
+                    {addingApp ? 'Choosing…' : 'Add App…'}
+                </Button>
+            </div>
+
+            <div className="bg-card rounded-lg border border-border p-6 shadow-sm">
+                <h3 className="text-lg font-semibold text-foreground mb-4">Model Settings</h3>
+                <div className="space-y-4">
                     <div>
                         <div className="flex space-x-2 mx-1">
                             <Select
@@ -169,7 +270,6 @@ export function TranscriptSettings({ transcriptModelConfig, setTranscriptModelCo
                         </div>
                     )}
 
-
                     {requiresApiKey && (
                         <div>
                             <Label className="block text-sm font-medium text-gray-700 mb-1">
@@ -218,7 +318,7 @@ export function TranscriptSettings({ transcriptModelConfig, setTranscriptModelCo
                     )}
                 </div>
             </div>
-        </div >
+        </div>
     )
 }
 

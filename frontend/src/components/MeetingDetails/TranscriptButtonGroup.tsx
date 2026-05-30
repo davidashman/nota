@@ -37,6 +37,20 @@ export function TranscriptButtonGroup({
   return (
     <div className="flex items-center justify-center w-full gap-2">
       <ButtonGroup>
+
+        {betaFeatures.importAndRetranscribe && meetingId && meetingFolderPath && (
+          <Button
+            size="sm"
+            variant="outline"
+            onClick={() => {
+              setShowRetranscribeDialog(true);
+            }}
+            title="Retranscribe to enhance your recorded audio"
+          >
+            <RefreshCw className="xl:mr-2" size={18} />
+            <span className="hidden lg:inline">Enhance</span>
+          </Button>
+        )}
         <Button
           variant="outline"
           size="sm"
@@ -49,21 +63,6 @@ export function TranscriptButtonGroup({
           <Copy />
           <span className="hidden lg:inline">Copy</span>
         </Button>
-
-        {betaFeatures.importAndRetranscribe && meetingId && meetingFolderPath && (
-          <Button
-            size="sm"
-            variant="outline"
-            className="bg-gradient-to-r from-blue-50 to-purple-50 hover:from-blue-100 hover:to-purple-100 border-blue-200 dark:from-blue-950/60 dark:to-purple-950/60 dark:hover:from-blue-900/60 dark:hover:to-purple-900/60 dark:border-blue-800/50 xl:px-4"
-            onClick={() => {
-              setShowRetranscribeDialog(true);
-            }}
-            title="Retranscribe to enhance your recorded audio"
-          >
-            <RefreshCw className="xl:mr-2" size={18} />
-            <span className="hidden lg:inline">Enhance</span>
-          </Button>
-        )}
       </ButtonGroup>
 
       {betaFeatures.importAndRetranscribe && meetingId && meetingFolderPath && (

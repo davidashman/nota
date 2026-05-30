@@ -185,7 +185,7 @@ export function DeviceSelection({ selectedDevices, onDeviceChange, disabled = fa
   return (
     <div className="space-y-4">
       <div className="flex items-center justify-between">
-        <h4 className="text-sm font-medium text-foreground">Audio Devices</h4>
+        <h3 className="text-lg font-semibold text-foreground">Audio Devices</h3>
         <div className="flex items-center space-x-2">
           {/* TODO: Monitoring */}
           {/* <button */}
@@ -246,19 +246,19 @@ export function DeviceSelection({ selectedDevices, onDeviceChange, disabled = fa
             </SelectContent>
           </Select>
           {inputDevices.length === 0 && (
-            <p className="text-xs text-gray-500">No microphone devices found</p>
+            <p className="text-xs text-muted-foreground">No microphone devices found</p>
           )}
 
           {/* Audio Level Meters for Input Devices */}
           {showLevels && inputDevices.length > 0 && (
-            <div className="space-y-2 pt-2 border-t border-gray-100">
-              <p className="text-xs text-gray-600 font-medium">Microphone Levels:</p>
+            <div className="space-y-2 pt-2 border-t border-border">
+              <p className="text-xs text-muted-foreground font-medium">Microphone Levels:</p>
               {inputDevices.map((device) => {
                 const levelData = audioLevels.get(device.name);
                 return (
                   <div key={`level-${device.name}`} className="space-y-1">
                     <div className="flex items-center justify-between">
-                      <span className="text-xs text-gray-600 truncate max-w-[200px]">
+                      <span className="text-xs text-muted-foreground truncate max-w-[200px]">
                         {device.name}
                       </span>
                       {levelData && (
@@ -316,12 +316,12 @@ export function DeviceSelection({ selectedDevices, onDeviceChange, disabled = fa
           </Select>
 
           {outputDevices.length === 0 && (
-            <p className="text-xs text-gray-500">No system audio devices found</p>
+            <p className="text-xs text-muted-foreground">No system audio devices found</p>
           )}
 
           {/* Backend Selection - available on all platforms */}
           {!disabled && (
-            <div className="pt-3 border-t border-gray-100">
+            <div className="pt-3 border-t border-border">
               <AudioBackendSelector disabled={disabled} />
             </div>
           )}
@@ -329,7 +329,7 @@ export function DeviceSelection({ selectedDevices, onDeviceChange, disabled = fa
       </div>
 
       {/* Info text */}
-      <div className="text-xs text-gray-500 space-y-1">
+      <div className="text-xs text-muted-foreground space-y-1">
         <p>• <strong>Microphone:</strong> Records your voice and ambient sound</p>
         <p>• <strong>System Audio:</strong> Records computer audio (music, calls, etc.)</p>
         {isMonitoring && (

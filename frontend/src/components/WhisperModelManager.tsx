@@ -2,6 +2,8 @@ import React, { useState, useEffect, useRef } from 'react';
 import { listen } from '@tauri-apps/api/event';
 import { invoke } from '@tauri-apps/api/core';
 import { motion, AnimatePresence } from 'framer-motion';
+import { Button } from '@/components/ui/button';
+import { Download, RefreshCw, Trash2 } from 'lucide-react';
 import {
   ModelInfo,
   ModelStatus,
@@ -573,49 +575,33 @@ function ModelCard({
             )}
 
             {isMissing && (
-              <button
-                onClick={(e) => {
-                  e.stopPropagation();
-                  onDownload();
-                }}
-                className="bg-blue-600 text-white px-3 py-1.5 rounded-md text-sm font-medium hover:bg-blue-700 transition-colors"
-              >
+              <Button variant="outline" size="sm" className="min-w-[100px]"
+                onClick={(e) => { e.stopPropagation(); onDownload(); }}>
+                <Download className="mr-2 h-4 w-4" />
                 Download
-              </button>
+              </Button>
             )}
 
             {downloadProgress === null && isError && (
-              <button
-                onClick={(e) => {
-                  e.stopPropagation();
-                  onDownload();
-                }}
-                className="bg-red-600 text-white px-3 py-1.5 rounded-md text-sm font-medium hover:bg-red-700 transition-colors"
-              >
+              <Button variant="outline" size="sm" className="min-w-[100px]"
+                onClick={(e) => { e.stopPropagation(); onDownload(); }}>
+                <RefreshCw className="mr-2 h-4 w-4" />
                 Retry
-              </button>
+              </Button>
             )}
 
             {isCorrupted && (
               <div className="flex gap-2">
-                <button
-                  onClick={(e) => {
-                    e.stopPropagation();
-                    onDelete();
-                  }}
-                  className="bg-orange-600 text-white px-3 py-1.5 rounded-md text-sm font-medium hover:bg-orange-700 transition-colors"
-                >
+                <Button variant="outline" size="sm"
+                  onClick={(e) => { e.stopPropagation(); onDownload(); }}>
+                  <RefreshCw className="mr-2 h-4 w-4" />
+                  Retry
+                </Button>
+                <Button variant="outline" size="sm"
+                  onClick={(e) => { e.stopPropagation(); onDelete(); }}>
+                  <Trash2 className="mr-2 h-4 w-4" />
                   Delete
-                </button>
-                <button
-                  onClick={(e) => {
-                    e.stopPropagation();
-                    onDownload();
-                  }}
-                  className="bg-blue-600 text-white px-3 py-1.5 rounded-md text-sm font-medium hover:bg-blue-700 transition-colors"
-                >
-                  Re-download
-                </button>
+                </Button>
               </div>
             )}
           </div>

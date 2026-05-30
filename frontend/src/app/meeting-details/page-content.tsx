@@ -1,5 +1,5 @@
 "use client";
-import { useState, useEffect, useRef } from 'react';
+import { useState, useEffect, useLayoutEffect, useRef } from 'react';
 import { motion } from 'framer-motion';
 import { Summary, SummaryResponse } from '@/types';
 import { useSidebar } from '@/components/Sidebar/SidebarProvider';
@@ -11,6 +11,12 @@ import { Tabs, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { Button } from '@/components/ui/button';
 import { FolderOpen } from 'lucide-react';
 import { ModelConfig } from '@/components/ModelSettingsModal';
+
+const TABS = [
+  { value: 'transcript' as const, label: 'Transcript' },
+  { value: 'summary' as const, label: 'Summary' },
+  { value: 'analysis' as const, label: 'Analysis' },
+];
 
 // Custom hooks
 import { useMeetingData } from '@/hooks/meeting-details/useMeetingData';
@@ -60,6 +66,16 @@ export default function PageContent({
   const [isRecording] = useState(false);
   const [summaryResponse] = useState<SummaryResponse | null>(null);
   const [activeTab, setActiveTab] = useState<'transcript' | 'summary' | 'analysis'>('summary');
+
+  // Tab underline animation
+  const tabRefs = useRef<(HTMLButtonElement | null)[]>([]);
+  const [underlineStyle, setUnderlineStyle] = useState({ left: 0, width: 0 });
+
+  useLayoutEffect(() => {
+    const activeIndex = TABS.findIndex(tab => tab.value === activeTab);
+    const el = tabRefs.current[activeIndex];
+    if (el) setUnderlineStyle({ left: el.offsetLeft, width: el.offsetWidth });
+  }, [activeTab]);
 
   // Ref to store the modal open function from SummaryGeneratorButtonGroup
   const openModelSettingsRef = useRef<(() => void) | null>(null);
@@ -167,18 +183,31 @@ export default function PageContent({
       className="flex flex-col h-screen bg-background"
     >
       {/* Tab bar */}
-      <div data-tauri-drag-region className="flex items-center justify-between px-4 py-2 border-b border-border shrink-0">
+      <div data-tauri-drag-region className="flex items-center justify-between border-b border-border shrink-0">
         <Tabs value={activeTab} onValueChange={(v) => setActiveTab(v as 'transcript' | 'summary' | 'analysis')}>
-          <TabsList className="h-7">
-            <TabsTrigger value="transcript" className="text-xs px-3 h-6">Transcript</TabsTrigger>
-            <TabsTrigger value="summary" className="text-xs px-3 h-6">Summary</TabsTrigger>
-            <TabsTrigger value="analysis" className="text-xs px-3 h-6">Analysis</TabsTrigger>
+          <TabsList className="bg-transparent relative rounded-none p-0 h-auto">
+            {TABS.map((tab, index) => (
+              <TabsTrigger
+                key={tab.value}
+                value={tab.value}
+                ref={el => { tabRefs.current[index] = el; }}
+                className="flex items-center px-4 py-2 bg-transparent rounded-none border-0 data-[state=active]:bg-transparent data-[state=active]:text-blue-500 data-[state=active]:shadow-none text-muted-foreground hover:text-foreground transition-colors relative z-10 text-sm"
+              >
+                {tab.label}
+              </TabsTrigger>
+            ))}
+            <motion.div
+              className="absolute bottom-0 z-20 h-0.5 bg-blue-600"
+              layoutId="content-tab-underline"
+              style={{ left: underlineStyle.left, width: underlineStyle.width }}
+              transition={{ type: 'spring', stiffness: 400, damping: 40 }}
+            />
           </TabsList>
         </Tabs>
         <Button
           variant="ghost"
           size="sm"
-          className="h-7 w-7 p-0"
+          className="h-7 w-7 p-0 mr-4"
           onClick={() => {
             meetingOperations.handleOpenMeetingFolder();
           }}
