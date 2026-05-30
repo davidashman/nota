@@ -103,9 +103,6 @@ export function TranscriptSettings({ transcriptModelConfig, setTranscriptModelCo
                 </div> */}
                 <div className="space-y-4 pb-6">
                     <div>
-                        <Label className="block text-sm font-medium text-gray-700 mb-1">
-                            Transcript Model
-                        </Label>
                         <div className="flex space-x-2 mx-1">
                             <Select
                                 value={uiProvider}

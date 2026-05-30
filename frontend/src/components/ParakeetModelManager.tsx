@@ -432,16 +432,18 @@ function ModelCard({
 
             {/* Tagline */}
             <p className="text-sm text-muted-foreground ml-9">{tagline}</p>
+            {isAvailable && (
+              <div className="flex items-center gap-1.5 text-green-600 pl-2">
+                <div className="w-2 h-2 bg-green-500 rounded-full"></div>
+                <span className="text-xs font-medium">Ready</span>
+              </div>
+            )}
           </div>
 
           {/* Status/Action */}
           <div className="ml-4 flex items-center gap-2">
             {isAvailable && (
               <>
-                <div className="flex items-center gap-1.5 text-green-600">
-                  <div className="w-2 h-2 bg-green-500 rounded-full"></div>
-                  <span className="text-xs font-medium">Ready</span>
-                </div>
                 <AnimatePresence>
                   {isHovered && (
                     <motion.button

@@ -300,11 +300,6 @@ export function BuiltInModelManager({ selectedModel, onModelSelect }: BuiltInMod
                           <span className="w-2 h-2 rounded-full bg-green-500"></span>
                           Ready
                         </span>
-                        {selectedModel === model.name && (
-                          <span className="px-2 py-0.5 text-xs font-medium bg-blue-500/20 text-blue-400 dark:text-blue-300 rounded">
-                            Selected
-                          </span>
-                        )}
                       </>
                     )}
                     {isCorrupted && (
@@ -316,11 +311,6 @@ export function BuiltInModelManager({ selectedModel, onModelSelect }: BuiltInMod
                     {isError && (
                       <span className="px-2 py-0.5 text-xs font-medium bg-red-500/20 text-red-500 dark:text-red-400 rounded">
                         Error
-                      </span>
-                    )}
-                    {isNotDownloaded && !modelIsDownloading && (
-                      <span className="text-xs text-muted-foreground font-medium">
-                        Not Downloaded
                       </span>
                     )}
                   </div>
