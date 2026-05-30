@@ -37,7 +37,7 @@ export function PermissionRow({ icon, title, description, status, isPending = fa
 
         {/* Title + Description */}
         <div className="min-w-0 flex-1">
-          <div className="font-medium truncate text-neutral-900">{title}</div>
+          <div className="font-medium truncate text-foreground">{title}</div>
           <div className="text-sm text-muted-foreground">
             {isAuthorized ? (
               <span className="text-green-600 flex items-center gap-1">
@@ -71,8 +71,8 @@ export function PermissionRow({ icon, title, description, status, isPending = fa
           </Button>
         )}
         {isAuthorized && (
-          <div className="flex size-8 items-center justify-center rounded-full bg-green-100">
-            <CheckCircle2 className="w-4 h-4 text-green-600" />
+          <div className="flex size-8 items-center justify-center rounded-full bg-green-500/20">
+            <CheckCircle2 className="w-4 h-4 text-green-500" />
           </div>
         )}
       </div>

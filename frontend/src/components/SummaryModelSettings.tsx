@@ -2,7 +2,6 @@
 
 import { useState, useEffect, useCallback } from 'react';
 import { invoke } from '@tauri-apps/api/core';
-import { toast } from 'sonner';
 import { ModelConfig, ModelSettingsModal } from '@/components/ModelSettingsModal';
 import { Switch } from './ui/switch';
 import { useConfig } from '@/contexts/ConfigContext';
@@ -61,7 +60,6 @@ export function SummaryModelSettings({ refetchTrigger }: SummaryModelSettingsPro
       }
     } catch (error) {
       console.error('Failed to fetch model config:', error);
-      toast.error('Failed to load model settings');
     }
   }, []);
 
@@ -113,32 +111,24 @@ export function SummaryModelSettings({ refetchTrigger }: SummaryModelSettingsPro
       // Emit event to sync other components
       const { emit } = await import('@tauri-apps/api/event');
       await emit('model-config-updated', config);
-
-      toast.success('Model settings saved successfully');
     } catch (error) {
       console.error('Error saving model config:', error);
-      toast.error('Failed to save model settings');
     }
   };
 
   return (
-    <div className='flex flex-col gap-4'>
+    <div className='flex flex-col gap-4 mb-6'>
       <div className="bg-card rounded-lg border border-border p-6 shadow-sm">
         <div className="flex items-center justify-between">
           <div>
-            <h3 className="text-lg font-semibold text-foreground mb-2">Auto Summary</h3>
-            <p className="text-sm text-muted-foreground">Auto Generating summary after meeting completion(Stopping)</p>
+            <h3 className="text-lg font-semibold text-foreground mb-2">Auto Analysis</h3>
+            <p className="text-sm text-muted-foreground">Automatically generate summary and deep analysis after a meeting ends</p>
           </div>
           <Switch checked={isAutoSummary} onCheckedChange={toggleIsAutoSummary} />
         </div>
       </div>
 
       <div className="bg-card rounded-lg border border-border p-6 shadow-sm">
-        <h3 className="text-lg font-semibold mb-4">Summary Model Configuration</h3>
-        <p className="text-sm text-muted-foreground mb-6">
-          Configure the AI model used for generating meeting summaries.
-        </p>
-
         <ModelSettingsModal
           modelConfig={modelConfig}
           setModelConfig={setModelConfig}

@@ -7,7 +7,6 @@ import { EmptyStateSummary } from '@/components/EmptyStateSummary';
 import { ModelConfig } from '@/components/ModelSettingsModal';
 import { SummaryGeneratorButtonGroup } from './SummaryGeneratorButtonGroup';
 import { SummaryUpdaterButtonGroup } from './SummaryUpdaterButtonGroup';
-import Analytics from '@/lib/analytics';
 import { RefObject } from 'react';
 
 interface SummaryPanelProps {
@@ -41,7 +40,6 @@ interface SummaryPanelProps {
   onDirtyChange: (isDirty: boolean) => void;
   summaryError: string | null;
   onRegenerateSummary: () => Promise<void>;
-  getSummaryStatusMessage: (status: 'idle' | 'processing' | 'summarizing' | 'regenerating' | 'completed' | 'error') => string;
   availableTemplates: Array<{ id: string, name: string, description: string }>;
   selectedTemplate: string;
   onTemplateSelect: (templateId: string, templateName: string) => void;
@@ -76,7 +74,6 @@ export function SummaryPanel({
   onDirtyChange,
   summaryError,
   onRegenerateSummary,
-  getSummaryStatusMessage,
   availableTemplates,
   selectedTemplate,
   onTemplateSelect,
@@ -245,7 +242,6 @@ export function SummaryPanel({
               status={summaryStatus}
               error={summaryError}
               onRegenerateSummary={() => {
-                Analytics.trackButtonClick('regenerate_summary', 'meeting_details');
                 onRegenerateSummary();
               }}
               meeting={{
@@ -255,14 +251,7 @@ export function SummaryPanel({
               }}
             />
           </div>
-          {summaryStatus !== 'idle' && (
-            <div className={`mt-4 p-4 rounded-lg ${summaryStatus === 'error' ? 'bg-red-900/30 text-red-400' :
-              summaryStatus === 'completed' ? 'bg-green-900/30 text-green-400' :
-                'bg-blue-900/30 text-blue-400'
-              }`}>
-              <p className="text-sm font-medium">{getSummaryStatusMessage(summaryStatus)}</p>
-            </div>
-          )}
+
         </div>
       )}
     </div>

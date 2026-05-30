@@ -10,9 +10,7 @@ import { ConfirmationModal } from '../ConfirmationModel/confirmation-modal';
 import { ModelConfig } from '@/components/ModelSettingsModal';
 import { SettingTabs } from '../SettingTabs';
 import { TranscriptModelProps } from '@/components/TranscriptSettings';
-import Analytics from '@/lib/analytics';
 import { invoke } from '@tauri-apps/api/core';
-import { toast } from 'sonner';
 import { useRecordingState, RecordingStatus } from '@/contexts/RecordingStateContext';
 import { useImportDialog } from '@/contexts/ImportDialogContext';
 import { useConfig } from '@/contexts/ConfigContext';
@@ -251,8 +249,6 @@ const Sidebar: React.FC = () => {
       const { emit } = await import('@tauri-apps/api/event');
       await emit('model-config-updated', config);
 
-      // Track settings change
-      await Analytics.trackSettingsChanged('model_config', `${config.provider}_${config.model}`);
     } catch (error) {
       console.error('Error saving model config:', error);
       setSettingsSaveSuccess(false);
@@ -277,10 +273,6 @@ const Sidebar: React.FC = () => {
 
 
       setSettingsSaveSuccess(true);
-
-      // Track settings change
-      const transcriptConfigToSave = updatedConfig || transcriptModelConfig;
-      await Analytics.trackSettingsChanged('transcript_config', `${transcriptConfigToSave.provider}_${transcriptConfigToSave.model}`);
     } catch (error) {
       console.error('Failed to save transcript config:', error);
       setSettingsSaveSuccess(false);
@@ -372,14 +364,6 @@ const Sidebar: React.FC = () => {
       const updatedMeetings = meetings.filter((m: CurrentMeeting) => m.id !== itemId);
       setMeetings(updatedMeetings);
 
-      // Track meeting deletion
-      Analytics.trackMeetingDeleted(itemId);
-
-      // Show success toast
-      toast.success("Meeting deleted successfully", {
-        description: "All associated data has been removed"
-      });
-
       // If deleting the active meeting, navigate to home
       if (currentMeeting?.id === itemId) {
         setCurrentMeeting({ id: 'intro-call', title: '+ New Call' });
@@ -387,9 +371,6 @@ const Sidebar: React.FC = () => {
       }
     } catch (error) {
       console.error('Failed to delete meeting:', error);
-      toast.error("Failed to delete meeting", {
-        description: error instanceof Error ? error.message : String(error)
-      });
     }
   };
 
@@ -418,7 +399,6 @@ const Sidebar: React.FC = () => {
 
     // Prevent empty titles
     if (!newTitle) {
-      toast.error("Meeting title cannot be empty");
       return;
     }
 
@@ -439,19 +419,11 @@ const Sidebar: React.FC = () => {
         setCurrentMeeting({ id: meetingId, title: newTitle });
       }
 
-      // Track the edit
-      Analytics.trackButtonClick('edit_meeting_title', 'sidebar');
-
-      toast.success("Meeting title updated successfully");
-
       // Close modal and reset state
       setEditModalState({ isOpen: false, meetingId: null, currentTitle: '' });
       setEditingTitle('');
     } catch (error) {
       console.error('Failed to update meeting title:', error);
-      toast.error("Failed to update meeting title", {
-        description: error instanceof Error ? error.message : String(error)
-      });
     }
   };
 
@@ -619,7 +591,7 @@ const Sidebar: React.FC = () => {
             onRecordingStart={handleRecordingToggle}
             onTranscriptReceived={() => {}}
             onStopInitiated={() => {}}
-            onTranscriptionError={(message) => toast.error(message)}
+            onTranscriptionError={(message) => console.error(message)}
             isRecordingDisabled={isRecordingDisabled}
             isParentProcessing={isProcessing}
             selectedDevices={selectedDevices}

@@ -224,7 +224,7 @@ export const VirtualizedTranscriptView: React.FC<VirtualizedTranscriptViewProps>
     const useVirtualization = segments.length >= VIRTUALIZATION_THRESHOLD;
 
     return (
-        <div ref={scrollRef} className="flex flex-col h-full overflow-y-auto px-4 py-2">
+        <div ref={scrollRef} className="flex flex-col h-full overflow-y-auto px-6 py-2">
             {/* Recording Status Bar - Sticky at top, always visible when recording */}
             <AnimatePresence>
                 {isRecording && (
@@ -267,7 +267,6 @@ export const VirtualizedTranscriptView: React.FC<VirtualizedTranscriptViewProps>
                                 </svg>
                             </div>
                             <p className="text-lg font-semibold text-gray-200">Nota</p>
-                            <p className="text-base mt-3 text-gray-400">Start listening to see live transcription</p>
                         </>
                     )}
                 </motion.div>

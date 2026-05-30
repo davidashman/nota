@@ -8,7 +8,6 @@ import { SummaryResponse } from '@/types/summary';
 import { listen } from '@tauri-apps/api/event';
 import { Alert, AlertDescription, AlertTitle } from "@/components/ui/alert"
 import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from '@/components/ui/tooltip';
-import Analytics from '@/lib/analytics';
 import { useRecordingState } from '@/contexts/RecordingStateContext';
 
 interface RecordingControlsProps {
@@ -149,7 +148,6 @@ export const RecordingControls: React.FC<RecordingControlsProps> = ({
       const savePath = `${dataDir}/recording-${timestamp}.wav`;
       await invoke('stop_recording', { args: { save_path: savePath } });
       setIsProcessing(false);
-      Analytics.trackTranscriptionSuccess();
       onRecordingStop(true);
     } catch (error) {
       console.error('Failed to stop recording:', error);
@@ -204,22 +202,13 @@ export const RecordingControls: React.FC<RecordingControlsProps> = ({
       try {
         const transcriptErrorUnsubscribe = await listen('transcript-error', (event) => {
           const errorMessage = event.payload as string;
-          Analytics.trackTranscriptionError(errorMessage);
           setTranscriptionErrors(prev => prev + 1);
           setIsProcessing(false);
           onRecordingStop(false);
           if (onTranscriptionError) onTranscriptionError(errorMessage);
         });
 
-        const transcriptionErrorUnsubscribe = await listen('transcription-error', (event) => {
-          let errorMessage: string;
-          if (typeof event.payload === 'object' && event.payload !== null) {
-            const payload = event.payload as { error: string; userMessage: string; actionable: boolean };
-            errorMessage = payload.userMessage || payload.error;
-          } else {
-            errorMessage = String(event.payload);
-          }
-          Analytics.trackTranscriptionError(errorMessage);
+        const transcriptionErrorUnsubscribe = await listen('transcription-error', () => {
           setTranscriptionErrors(prev => prev + 1);
           setIsProcessing(false);
           onRecordingStop(false);
@@ -261,10 +250,8 @@ export const RecordingControls: React.FC<RecordingControlsProps> = ({
                   onClick={() => {
                     if (isRecording) {
                       if (isPaused) {
-                        Analytics.trackButtonClick('resume_recording', 'recording_controls');
                         handleResumeRecording();
                       } else {
-                        Analytics.trackButtonClick('pause_recording', 'recording_controls');
                         handlePauseRecording();
                       }
                     } else if (onDismiss) {
@@ -310,10 +297,8 @@ export const RecordingControls: React.FC<RecordingControlsProps> = ({
             <button
               onClick={() => {
                 if (isRecording) {
-                  Analytics.trackButtonClick('stop_recording', 'recording_controls');
                   handleStopRecording();
                 } else {
-                  Analytics.trackButtonClick('start_recording', 'recording_controls');
                   handleStartRecording();
                 }
               }}

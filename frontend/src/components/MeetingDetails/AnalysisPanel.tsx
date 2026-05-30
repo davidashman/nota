@@ -17,7 +17,6 @@ import {
 import { VisuallyHidden } from '@/components/ui/visually-hidden';
 import { Sparkles, Settings, Copy, Square, Save, Loader2 } from 'lucide-react';
 import { invoke } from '@tauri-apps/api/core';
-import { toast } from 'sonner';
 
 interface AnalysisPanelProps {
   meetingId: string;
@@ -49,9 +48,7 @@ export function AnalysisPanel({ meetingId, transcripts }: AnalysisPanelProps) {
     try {
       await invoke('api_save_analysis', { meetingId, markdown: data.markdown });
       setIsDirty(false);
-      toast.success('Analysis saved');
     } catch (e) {
-      toast.error('Failed to save analysis');
       console.error(e);
     } finally {
       setIsSaving(false);
@@ -69,9 +66,7 @@ export function AnalysisPanel({ meetingId, transcripts }: AnalysisPanelProps) {
     try {
       const text = await analysisRef.current.getMarkdown();
       await navigator.clipboard.writeText(text);
-      toast.success('Analysis copied to clipboard');
     } catch {
-      toast.error('Failed to copy analysis');
     }
   }, []);
 
@@ -87,10 +82,8 @@ export function AnalysisPanel({ meetingId, transcripts }: AnalysisPanelProps) {
       });
       const { emit } = await import('@tauri-apps/api/event');
       await emit('model-config-updated', config);
-      toast.success('Model settings saved');
       setSettingsOpen(false);
     } catch {
-      toast.error('Failed to save model settings');
     }
   };
 

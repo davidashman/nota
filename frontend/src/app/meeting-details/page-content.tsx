@@ -3,9 +3,7 @@ import { useState, useEffect, useRef } from 'react';
 import { motion } from 'framer-motion';
 import { Summary, SummaryResponse } from '@/types';
 import { useSidebar } from '@/components/Sidebar/SidebarProvider';
-import Analytics from '@/lib/analytics';
 import { invoke } from '@tauri-apps/api/core';
-import { toast } from 'sonner';
 import { TranscriptPanel } from '@/components/MeetingDetails/TranscriptPanel';
 import { SummaryPanel } from '@/components/MeetingDetails/SummaryPanel';
 import { AnalysisPanel } from '@/components/MeetingDetails/AnalysisPanel';
@@ -108,10 +106,8 @@ export default function PageContent({
       const { emit } = await import('@tauri-apps/api/event');
       await emit('model-config-updated', config);
 
-      toast.success('Model settings saved successfully');
     } catch (error) {
       console.error('Failed to save model config:', error);
-      toast.error('Failed to save model settings');
     }
   };
 
@@ -138,11 +134,6 @@ export default function PageContent({
   const meetingOperations = useMeetingOperations({
     meeting,
   });
-
-  // Track page view
-  useEffect(() => {
-    Analytics.trackPageView('meeting_details');
-  }, []);
 
   // Auto-generate summary when flag is set
   useEffect(() => {
@@ -189,7 +180,6 @@ export default function PageContent({
           size="sm"
           className="h-7 w-7 p-0"
           onClick={() => {
-            Analytics.trackButtonClick('open_recording_folder', 'meeting_details');
             meetingOperations.handleOpenMeetingFolder();
           }}
           title="Open Recording Folder"
@@ -248,7 +238,6 @@ export default function PageContent({
             onDirtyChange={meetingData.setIsSummaryDirty}
             summaryError={summaryGeneration.summaryError}
             onRegenerateSummary={summaryGeneration.handleRegenerateSummary}
-            getSummaryStatusMessage={summaryGeneration.getSummaryStatusMessage}
             availableTemplates={templates.availableTemplates}
             selectedTemplate={templates.selectedTemplate}
             onTemplateSelect={templates.handleTemplateSelection}

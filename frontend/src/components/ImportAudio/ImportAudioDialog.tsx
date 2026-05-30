@@ -30,7 +30,6 @@ import {
   SelectTrigger,
   SelectValue,
 } from '../ui/select';
-import { toast } from 'sonner';
 import { useConfig } from '@/contexts/ConfigContext';
 import { useImportAudio, ImportResult } from '@/hooks/useImportAudio';
 import { useRouter } from 'next/navigation';
@@ -95,8 +94,6 @@ export function ImportAudioDialog({
   } = useTranscriptionModels(transcriptModelConfig);
 
   const handleImportComplete = useCallback((result: ImportResult) => {
-    toast.success(`Import complete! ${result.segments_count} segments created.`);
-
     // Refresh meetings list then navigate to the imported meeting
     refetchMeetings();
     onComplete?.();
@@ -104,8 +101,7 @@ export function ImportAudioDialog({
     router.push(`/meeting-details?id=${result.meeting_id}`);
   }, [router, refetchMeetings, onComplete, onOpenChange]);
 
-  const handleImportError = useCallback((error: string) => {
-    toast.error('Import failed', { description: error });
+  const handleImportError = useCallback((_error: string) => {
   }, []);
 
   const {
@@ -199,7 +195,6 @@ export function ImportAudioDialog({
   const handleCancel = async () => {
     if (isProcessing) {
       await cancelImport();
-      toast.info('Import cancelled');
     }
     onOpenChange(false);
   };

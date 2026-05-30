@@ -2,12 +2,10 @@ import React, { useState, useEffect } from "react";
 import { invoke } from '@tauri-apps/api/core';
 import { getVersion } from '@tauri-apps/api/app';
 import Image from 'next/image';
-import AnalyticsConsentSwitch from "./AnalyticsConsentSwitch";
 import { UpdateDialog } from "./UpdateDialog";
 import { updateService, UpdateInfo } from '@/services/updateService';
 import { Button } from './ui/button';
 import { Loader2, CheckCircle2 } from 'lucide-react';
-import { toast } from 'sonner';
 
 
 export function About() {
@@ -36,12 +34,9 @@ export function About() {
             setUpdateInfo(info);
             if (info.available) {
                 setShowUpdateDialog(true);
-            } else {
-                toast.success('You are running the latest version');
             }
         } catch (error: any) {
             console.error('Failed to check for updates:', error);
-            toast.error('Failed to check for updates: ' + (error.message || 'Unknown error'));
         } finally {
             setIsChecking(false);
         }
@@ -143,8 +138,6 @@ export function About() {
                     Built by Zackriya Solutions
                 </p>
             </div>
-            <AnalyticsConsentSwitch />
-
             {/* Update Dialog */}
             <UpdateDialog
                 open={showUpdateDialog}

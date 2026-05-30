@@ -28,7 +28,6 @@ import {
   CommandList,
 } from '@/components/ui/command';
 import { cn, isOllamaNotInstalledError } from '@/lib/utils';
-import { toast } from 'sonner';
 
 export interface ModelConfig {
   provider: 'ollama' | 'groq' | 'claude' | 'openai' | 'openrouter' | 'builtin-ai' | 'custom-openai';
@@ -247,11 +246,6 @@ export function ModelSettingsModal({
     !customOpenAIModel.trim()
   );
 
-  const isDoneDisabled =
-    (requiresApiKey && (!apiKey || (typeof apiKey === 'string' && !apiKey.trim()))) ||
-    (modelConfig.provider === 'ollama' && ollamaEndpointChanged) ||
-    isCustomOpenAIInvalid;
-
   useEffect(() => {
     const fetchModelConfig = async () => {
       // If parent component manages config, skip fetch and just mark as loaded
@@ -418,9 +412,6 @@ export function ModelSettingsModal({
     if (trimmedEndpoint && !validateOllamaEndpoint(trimmedEndpoint)) {
       const errorMsg = 'Invalid Ollama endpoint URL. Must start with http:// or https://';
       setError(errorMsg);
-      if (!silent) {
-        toast.error(errorMsg);
-      }
       return;
     }
 
@@ -449,9 +440,6 @@ export function ModelSettingsModal({
         setOllamaNotInstalled(false);
       }
 
-      if (!silent) {
-        toast.error(errorMsg);
-      }
       console.error('Error loading models:', err);
     } finally {
       setIsLoadingOllama(false);
@@ -517,7 +505,6 @@ export function ModelSettingsModal({
       }
     } catch (err) {
       console.error('Error loading Built-in AI models:', err);
-      toast.error('Failed to load Built-in AI models');
     }
   };
 
@@ -612,9 +599,11 @@ export function ModelSettingsModal({
     }
   }, [models, openRouterModels, builtinAiModels, openaiModels, claudeModels, groqModels, modelConfig.provider]);
 
-  const handleSave = async () => {
+  const handleSave = async (configOverride?: Partial<ModelConfig>) => {
+    const base = configOverride ? { ...modelConfig, ...configOverride } : modelConfig;
+
     // For custom-openai provider, save the custom config first
-    if (modelConfig.provider === 'custom-openai') {
+    if (base.provider === 'custom-openai') {
       try {
         await invoke('api_save_custom_openai_config', {
           endpoint: customOpenAIEndpoint.trim(),
@@ -624,41 +613,34 @@ export function ModelSettingsModal({
           temperature: customTemperature ? parseFloat(customTemperature) : null,
           topP: customTopP ? parseFloat(customTopP) : null,
         });
-        console.log('Custom OpenAI config saved successfully');
       } catch (err) {
         console.error('Failed to save custom OpenAI config:', err);
-        toast.error('Failed to save custom OpenAI configuration');
         return;
       }
     }
 
     const updatedConfig = {
-      ...modelConfig,
+      ...base,
       apiKey: typeof apiKey === 'string' ? apiKey.trim() || null : null,
-      ollamaEndpoint: modelConfig.provider === 'ollama'
+      ollamaEndpoint: base.provider === 'ollama'
         ? (ollamaEndpoint.trim() || null)
-        : (modelConfig.ollamaEndpoint || null),
-      // Include custom OpenAI fields
-      customOpenAIEndpoint: modelConfig.provider === 'custom-openai' ? customOpenAIEndpoint.trim() : null,
-      customOpenAIModel: modelConfig.provider === 'custom-openai' ? customOpenAIModel.trim() : null,
-      customOpenAIApiKey: modelConfig.provider === 'custom-openai' && customOpenAIApiKey.trim() ? customOpenAIApiKey.trim() : null,
-      maxTokens: modelConfig.provider === 'custom-openai' && customMaxTokens ? parseInt(customMaxTokens, 10) : null,
-      temperature: modelConfig.provider === 'custom-openai' && customTemperature ? parseFloat(customTemperature) : null,
-      topP: modelConfig.provider === 'custom-openai' && customTopP ? parseFloat(customTopP) : null,
-      // For custom-openai, use the customOpenAIModel as the model field
-      model: modelConfig.provider === 'custom-openai' ? customOpenAIModel.trim() : modelConfig.model,
+        : (base.ollamaEndpoint || null),
+      customOpenAIEndpoint: base.provider === 'custom-openai' ? customOpenAIEndpoint.trim() : null,
+      customOpenAIModel: base.provider === 'custom-openai' ? customOpenAIModel.trim() : null,
+      customOpenAIApiKey: base.provider === 'custom-openai' && customOpenAIApiKey.trim() ? customOpenAIApiKey.trim() : null,
+      maxTokens: base.provider === 'custom-openai' && customMaxTokens ? parseInt(customMaxTokens, 10) : null,
+      temperature: base.provider === 'custom-openai' && customTemperature ? parseFloat(customTemperature) : null,
+      topP: base.provider === 'custom-openai' && customTopP ? parseFloat(customTopP) : null,
+      model: base.provider === 'custom-openai' ? customOpenAIModel.trim() : base.model,
     };
     setModelConfig(updatedConfig);
-    console.log('ModelSettingsModal - handleSave - Updated ModelConfig:', updatedConfig);
 
-    // Persist confirmed model choice to per-provider cache
     if (updatedConfig.model) {
       const map = JSON.parse(localStorage.getItem('providerModelMap') || '{}');
       map[updatedConfig.provider] = updatedConfig.model;
       localStorage.setItem('providerModelMap', JSON.stringify(map));
     }
 
-    // Update provider-specific key in context
     if (updateProviderApiKey && updatedConfig.apiKey && updatedConfig.provider !== 'custom-openai') {
       updateProviderApiKey(updatedConfig.provider, updatedConfig.apiKey);
     }
@@ -669,21 +651,18 @@ export function ModelSettingsModal({
   // Test custom OpenAI connection
   const testCustomOpenAIConnection = async () => {
     if (!customOpenAIEndpoint.trim() || !customOpenAIModel.trim()) {
-      toast.error('Please enter endpoint URL and model name first');
       return;
     }
 
     setIsTestingConnection(true);
     try {
-      const result = await invoke<{ status: string; message: string }>('api_test_custom_openai_connection', {
+      await invoke<{ status: string; message: string }>('api_test_custom_openai_connection', {
         endpoint: customOpenAIEndpoint.trim(),
         apiKey: customOpenAIApiKey.trim() || null,
         model: customOpenAIModel.trim(),
       });
-      toast.success(result.message || 'Connection successful!');
     } catch (err) {
-      const errorMsg = err instanceof Error ? err.message : String(err);
-      toast.error(errorMsg);
+      console.error('Connection test failed:', err);
     } finally {
       setIsTestingConnection(false);
     }
@@ -702,9 +681,6 @@ export function ModelSettingsModal({
 
     // Prevent duplicate downloads (defense in depth - backend also checks)
     if (isDownloading(recommendedModel)) {
-      toast.info(`${recommendedModel} is already downloading`, {
-        description: `Progress: ${Math.round(getProgress(recommendedModel) || 0)}%`
-      });
       return;
     }
 
@@ -729,14 +705,6 @@ export function ModelSettingsModal({
 
       // Check if Ollama is not installed and show appropriate error
       if (isOllamaNotInstalledError(errorMsg)) {
-        toast.error('Ollama is not installed', {
-          description: 'Please download and install Ollama before downloading models.',
-          duration: 7000,
-          action: {
-            label: 'Download',
-            onClick: () => invoke('open_external_url', { url: 'https://ollama.com/download' })
-          }
-        });
         // Update the installation status flag
         setOllamaNotInstalled(true);
       }
@@ -753,11 +721,8 @@ export function ModelSettingsModal({
         endpoint
       });
 
-      toast.success(`Model ${modelName} deleted`);
       await fetchOllamaModels(true); // Refresh list
     } catch (err) {
-      const errorMsg = err instanceof Error ? err.message : 'Failed to delete model';
-      toast.error(errorMsg);
       console.error('Error deleting model:', err);
     }
   };
@@ -807,7 +772,6 @@ export function ModelSettingsModal({
 
       <div className="space-y-4">
         <div>
-          <Label>Summarization Model</Label>
           <div className="flex space-x-2 mt-1">
             <Select
               value={modelConfig.provider}
@@ -834,11 +798,9 @@ export function ModelSettingsModal({
                   ? savedModel
                   : defaultModel;
 
-                setModelConfig({
-                  ...modelConfig,
-                  provider,
-                  model,
-                });
+                const newProviderConfig = { ...modelConfig, provider, model };
+                setModelConfig(newProviderConfig);
+                handleSave(newProviderConfig);
                 // API key is now synced automatically via useEffect watching providerApiKeys
 
                 // Load OpenRouter models only when OpenRouter is selected
@@ -918,8 +880,10 @@ export function ModelSettingsModal({
                                 key={model}
                                 value={model}
                                 onSelect={(currentValue) => {
-                                  setModelConfig((prev: ModelConfig) => ({ ...prev, model: currentValue }));
+                                  const newModelConfig = { ...modelConfig, model: currentValue };
+                                  setModelConfig(newModelConfig);
                                   setModelComboboxOpen(false);
+                                  handleSave(newModelConfig);
                                 }}
                               >
                                 <Check
@@ -951,6 +915,7 @@ export function ModelSettingsModal({
                 id="custom-endpoint"
                 value={customOpenAIEndpoint}
                 onChange={(e) => setCustomOpenAIEndpoint(e.target.value)}
+                onBlur={() => handleSave()}
                 placeholder="http://localhost:8000/v1"
                 className="mt-1"
               />
@@ -965,6 +930,7 @@ export function ModelSettingsModal({
                 id="custom-model"
                 value={customOpenAIModel}
                 onChange={(e) => setCustomOpenAIModel(e.target.value)}
+                onBlur={() => handleSave()}
                 placeholder="gpt-4, llama-3-70b, etc."
                 className="mt-1"
               />
@@ -980,6 +946,7 @@ export function ModelSettingsModal({
                 type="password"
                 value={customOpenAIApiKey}
                 onChange={(e) => setCustomOpenAIApiKey(e.target.value)}
+                onBlur={() => handleSave()}
                 placeholder="Leave empty if not required"
                 className="mt-1"
               />
@@ -1076,6 +1043,7 @@ export function ModelSettingsModal({
                 type={showApiKey ? 'text' : 'password'}
                 value={apiKey || ''}
                 onChange={(e) => setApiKey(e.target.value)}
+                onBlur={() => handleSave()}
                 disabled={isApiKeyLocked}
                 placeholder="Enter your API key"
                 className="pr-24"
@@ -1321,7 +1289,9 @@ export function ModelSettingsModal({
                           )}
                           onClick={() => {
                             if (!modelIsDownloading) {
-                              setModelConfig((prev: ModelConfig) => ({ ...prev, model: model.name }))
+                              const newOllamaConfig = { ...modelConfig, model: model.name };
+                              setModelConfig(newOllamaConfig);
+                              handleSave(newOllamaConfig);
                             }
                           }}
                         >
@@ -1361,9 +1331,11 @@ export function ModelSettingsModal({
           <div className="mt-6">
             <BuiltInModelManager
               selectedModel={modelConfig.model}
-              onModelSelect={(model) =>
-                setModelConfig((prev: ModelConfig) => ({ ...prev, model }))
-              }
+              onModelSelect={(model) => {
+                const newBuiltinConfig = { ...modelConfig, model };
+                setModelConfig(newBuiltinConfig);
+                handleSave(newBuiltinConfig);
+              }}
             />
           </div>
         )}
@@ -1388,18 +1360,6 @@ export function ModelSettingsModal({
         </div>
       </div> */}
 
-      <div className="mt-6 flex justify-end">
-        <Button
-          className={cn(
-            'px-4 text-sm font-medium text-white rounded-md focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500',
-            isDoneDisabled ? 'bg-gray-400 cursor-not-allowed' : 'bg-blue-600 hover:bg-blue-700'
-          )}
-          onClick={handleSave}
-          disabled={isDoneDisabled}
-        >
-          Save
-        </Button>
-      </div>
     </div>
   );
 }

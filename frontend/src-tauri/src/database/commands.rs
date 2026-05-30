@@ -230,6 +230,25 @@ pub async fn get_database_directory(app: AppHandle) -> Result<String, String> {
     Ok(app_data_dir.to_string_lossy().to_string())
 }
 
+/// Open a folder picker and return the selected directory path
+#[tauri::command]
+pub async fn select_notes_directory(app: AppHandle) -> Result<Option<String>, String> {
+    use tauri_plugin_dialog::DialogExt;
+
+    let picked = tokio::task::spawn_blocking(move || {
+        app.dialog()
+            .file()
+            .blocking_pick_folder()
+    })
+    .await
+    .map_err(|e| format!("Dialog task failed: {}", e))?;
+
+    match picked {
+        Some(path) => Ok(Some(path.to_string())),
+        None => Ok(None),
+    }
+}
+
 /// Open the database folder in the system file explorer
 #[tauri::command]
 pub async fn open_database_folder(app: AppHandle) -> Result<(), String> {

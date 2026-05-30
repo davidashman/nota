@@ -4,7 +4,6 @@ import { useState, useCallback } from 'react';
 import { Button } from '@/components/ui/button';
 import { ButtonGroup } from '@/components/ui/button-group';
 import { Copy, RefreshCw } from 'lucide-react';
-import Analytics from '@/lib/analytics';
 import { RetranscribeDialog } from './RetranscribeDialog';
 import { useConfig } from '@/contexts/ConfigContext';
 
@@ -42,7 +41,6 @@ export function TranscriptButtonGroup({
           variant="outline"
           size="sm"
           onClick={() => {
-            Analytics.trackButtonClick('copy_transcript', 'meeting_details');
             onCopyTranscript();
           }}
           disabled={transcriptCount === 0}
@@ -58,7 +56,6 @@ export function TranscriptButtonGroup({
             variant="outline"
             className="bg-gradient-to-r from-blue-50 to-purple-50 hover:from-blue-100 hover:to-purple-100 border-blue-200 dark:from-blue-950/60 dark:to-purple-950/60 dark:hover:from-blue-900/60 dark:hover:to-purple-900/60 dark:border-blue-800/50 xl:px-4"
             onClick={() => {
-              Analytics.trackButtonClick('enhance_transcript', 'meeting_details');
               setShowRetranscribeDialog(true);
             }}
             title="Retranscribe to enhance your recorded audio"

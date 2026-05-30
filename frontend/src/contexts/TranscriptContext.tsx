@@ -2,7 +2,6 @@
 
 import React, { createContext, useContext, useState, useEffect, useRef, useCallback, ReactNode, MutableRefObject } from 'react';
 import { Transcript, TranscriptUpdate } from '@/types';
-import { toast } from 'sonner';
 import { useRecordingState } from './RecordingStateContext';
 import { transcriptService } from '@/services/transcriptService';
 import { recordingService } from '@/services/recordingService';
@@ -468,8 +467,6 @@ export function TranscriptProvider({ children }: { children: ReactNode }) {
       .map(t => `${formatTime(t.audio_start_time)} ${t.text}`)
       .join('\n');
     navigator.clipboard.writeText(fullTranscript);
-
-    toast.success("Transcript copied to clipboard");
   }, [transcripts]);
 
   // Force flush buffer (for final transcript processing)

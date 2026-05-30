@@ -5,7 +5,6 @@ import { Mic, Sparkles, Check, Loader2, Download } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { OnboardingContainer } from '../OnboardingContainer';
 import { useOnboarding } from '@/contexts/OnboardingContext';
-import { toast } from 'sonner';
 import { motion, AnimatePresence } from 'framer-motion';
 
 const PARAKEET_MODEL = 'parakeet-tdt-0.6b-v3-int8';
@@ -90,9 +89,6 @@ export function DownloadProgressStep() {
         error: error instanceof Error ? error.message : 'Retry failed',
       }));
 
-      toast.error('Download retry failed', {
-        description: 'Please check your connection and try again.',
-      });
     } finally {
       // Allow retry again after 2 seconds
       setTimeout(() => {
@@ -133,9 +129,6 @@ export function DownloadProgressStep() {
         error: error instanceof Error ? error.message : 'Retry failed',
       }));
 
-      toast.error('Summary model download retry failed', {
-        description: 'Please check your connection and try again.',
-      });
     } finally {
       // Allow retry again after 2 seconds
       setTimeout(() => {
@@ -308,25 +301,10 @@ export function DownloadProgressStep() {
           progress: 100,
         }));
       } else if (!actuallyAvailable && parakeetState.status === 'error') {
-        toast.error('Transcription engine required', {
-          description: 'Please retry the download before continuing.',
-        });
         return;
       }
     } catch (error) {
       console.warn('[DownloadProgressStep] Failed to verify model:', error);
-    }
-
-    // Check if downloads are complete for toast notification
-    const downloadsComplete = parakeetState.status === 'completed' &&
-      gemmaState.status === 'completed';
-
-    // Show toast if downloads still in progress
-    if (!downloadsComplete) {
-      toast.info('Downloads will continue in the background', {
-        description: 'You can start using the app. Recording will be available once speech recognition is ready.',
-        duration: 5000,
-      });
     }
 
     if (isMac) {
@@ -344,9 +322,6 @@ export function DownloadProgressStep() {
         window.location.reload();
       } catch (error) {
         console.error('Failed to complete onboarding:', error);
-        toast.error('Failed to complete setup', {
-          description: 'Please try again.',
-        });
         setIsCompleting(false);
       }
     }
@@ -365,20 +340,20 @@ export function DownloadProgressStep() {
             {icon}
           </div>
           <div>
-            <h3 className="font-medium text-foreground00">{title}</h3>
-            <p className="text-sm text-muted-foreground00">{modelSize}</p>
+            <h3 className="font-medium text-foreground">{title}</h3>
+            <p className="text-sm text-muted-foreground">{modelSize}</p>
           </div>
         </div>
         <div>
           {state.status === 'waiting' && (
-            <span className="text-sm text-muted-foreground00">Waiting...</span>
+            <span className="text-sm text-muted-foreground">Waiting...</span>
           )}
           {state.status === 'downloading' && (
-            <Loader2 className="w-5 h-5 text-foreground00 animate-spin" />
+            <Loader2 className="w-5 h-5 text-foreground animate-spin" />
           )}
           {state.status === 'completed' && (
-            <div className="w-6 h-6 rounded-full bg-green-100 flex items-center justify-center">
-              <Check className="w-4 h-4 text-green-600" />
+            <div className="w-6 h-6 rounded-full bg-green-500/20 flex items-center justify-center">
+              <Check className="w-4 h-4 text-green-500" />
             </div>
           )}
           {state.status === 'error' && (
@@ -397,16 +372,16 @@ export function DownloadProgressStep() {
             />
           </div>
           <div className="flex items-center justify-between text-sm">
-            <span className="text-muted-foreground00">
+            <span className="text-muted-foreground">
               {state.downloadedMb.toFixed(1)} MB / {state.totalMb.toFixed(1)} MB
             </span>
             <div className="flex items-center gap-2">
               {state.speedMbps > 0 && (
-                <span className="text-muted-foreground00">
+                <span className="text-muted-foreground">
                   {state.speedMbps.toFixed(1)} MB/s
                 </span>
               )}
-              <span className="font-semibold text-foreground00">
+              <span className="font-semibold text-foreground">
                 {Math.round(state.progress)}%
               </span>
             </div>
@@ -415,13 +390,13 @@ export function DownloadProgressStep() {
       )}
 
       {state.status === 'error' && state.error && (
-        <div className="mt-2 p-3 bg-red-50 border border-red-200 rounded-md">
-          <p className="text-sm text-red-600 font-medium">Download Error</p>
-          <p className="text-xs text-red-500 mt-1">{state.error}</p>
+        <div className="mt-2 p-3 bg-red-500/10 border border-red-500/30 rounded-md">
+          <p className="text-sm text-red-500 font-medium">Download Error</p>
+          <p className="text-xs text-red-500/80 mt-1">{state.error}</p>
           {(title === 'Transcription Engine' || title === 'Summary Engine') && (
             <button
               onClick={title === 'Transcription Engine' ? handleRetryDownload : handleRetrySummaryDownload}
-              className="mt-3 w-full h-9 px-4 bg-gray-900 hover:bg-gray-800 text-white text-sm font-medium rounded-md transition-colors flex items-center justify-center gap-2"
+              className="mt-3 w-full h-9 px-4 bg-foreground hover:bg-foreground/90 text-background text-sm font-medium rounded-md transition-colors flex items-center justify-center gap-2"
             >
               <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                 <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2}
@@ -447,14 +422,14 @@ export function DownloadProgressStep() {
         <div className="w-full max-w-lg space-y-4">
           {renderDownloadCard(
             'Transcription Engine',
-            <Mic className="w-5 h-5 text-muted-foreground00" />,
+            <Mic className="w-5 h-5 text-muted-foreground" />,
             parakeetState,
             '~670 MB'
           )}
 
           {renderDownloadCard(
             'Summary Engine',
-            <Sparkles className="w-5 h-5 text-muted-foreground00" />,
+            <Sparkles className="w-5 h-5 text-muted-foreground" />,
             gemmaState,
             recommendedModel === 'gemma3:4b' ? '~2.5 GB' : '~806 MB'
           )}
@@ -471,10 +446,10 @@ export function DownloadProgressStep() {
               className="w-full max-w-lg bg-muted rounded-lg p-4 text-sm text-foreground"
             >
               <div className="flex items-start gap-3">
-                <Download className="w-5 h-5 text-muted-foreground00 flex-shrink-0 mt-0.5" />
+                <Download className="w-5 h-5 text-muted-foreground flex-shrink-0 mt-0.5" />
                 <div>
                   <p className="font-medium">You can continue while this finishes</p>
-                  <p className="text-foreground00 mt-1">
+                  <p className="text-foreground mt-1">
                     Download will continue in the background.
                   </p>
                 </div>
@@ -488,7 +463,7 @@ export function DownloadProgressStep() {
           <Button
             onClick={handleContinue}
             disabled={!parakeetDownloaded || isCompleting}
-            className="w-full h-11 bg-gray-900 hover:bg-gray-800 text-white disabled:opacity-50 disabled:cursor-not-allowed"
+            className="w-full h-11 bg-foreground hover:bg-foreground/90 text-background disabled:opacity-50 disabled:cursor-not-allowed"
           >
             {(isCompleting || !parakeetDownloaded) ? (
               <Loader2 className="w-4 h-4 mr-2 animate-spin" />

@@ -1,57 +1,65 @@
 "use client"
 
-import { useEffect } from "react"
-import Analytics from "@/lib/analytics"
-import AnalyticsConsentSwitch from "./AnalyticsConsentSwitch"
-import { useConfig } from "@/contexts/ConfigContext"
+import { useState } from "react"
+import { invoke } from "@tauri-apps/api/core"
+import { Sun, Moon } from "lucide-react"
+import { Switch } from "./ui/switch"
+import { useTheme } from "@/contexts/ThemeContext"
+
+const DEFAULT_NOTES_LOCATION = "~/Documents/Nota"
 
 export function PreferenceSettings() {
-  const { storageLocations, isLoadingPreferences, loadPreferences } = useConfig();
+  const [notesLocation, setNotesLocation] = useState<string>(DEFAULT_NOTES_LOCATION);
+  const [isSelectingLocation, setIsSelectingLocation] = useState(false);
+  const { theme, toggle: toggleTheme } = useTheme();
 
-  useEffect(() => {
-    loadPreferences();
-    Analytics.track('preferences_viewed', {}).catch(() => {});
-  }, [loadPreferences]);
-
-  if (isLoadingPreferences && !storageLocations) {
-    return <div className="max-w-2xl mx-auto p-6">Loading Preferences...</div>
-  }
+  const handleSelectLocation = async () => {
+    setIsSelectingLocation(true);
+    try {
+      const selected = await invoke<string | null>("select_notes_directory");
+      if (selected) {
+        setNotesLocation(selected);
+      }
+    } catch (err) {
+      console.error("Failed to select notes directory:", err);
+    } finally {
+      setIsSelectingLocation(false);
+    }
+  };
 
   return (
     <div className="space-y-6">
-      {/* Data Storage Locations Section */}
+      {/* Dark Mode */}
       <div className="bg-card rounded-lg border border-border p-6 shadow-sm">
-        <h3 className="text-lg font-semibold text-foreground mb-4">Data Storage Locations</h3>
-        <p className="text-sm text-muted-foreground mb-6">
-          View where Nota stores your data
-        </p>
-
-        <div className="space-y-4">
-          <div className="p-4 border border-border rounded-lg bg-muted/50">
-            <div className="font-medium mb-2">Database</div>
-            <div className="text-sm text-muted-foreground mb-3 break-all font-mono text-xs">
-              {storageLocations?.database || 'Loading...'}
+        <div className="flex items-center justify-between">
+          <div className="flex-1">
+            <div className="flex items-center gap-2 mb-1">
+              {theme === 'dark' ? <Moon className="h-5 w-5 text-muted-foreground" /> : <Sun className="h-5 w-5 text-muted-foreground" />}
+              <h3 className="text-lg font-semibold text-foreground">Dark Mode</h3>
             </div>
+            <p className="text-sm text-muted-foreground">Switch between light and dark appearance</p>
           </div>
-
-          <div className="p-4 border border-border rounded-lg bg-muted/50">
-            <div className="font-medium mb-2">Models</div>
-            <div className="text-sm text-muted-foreground mb-3 break-all font-mono text-xs">
-              {storageLocations?.models || 'Loading...'}
-            </div>
+          <div className="ml-6">
+            <Switch checked={theme === 'dark'} onCheckedChange={() => toggleTheme()} />
           </div>
-        </div>
-
-        <div className="mt-4 p-3 bg-blue-500/10 border border-blue-500/30 rounded-md">
-          <p className="text-xs text-blue-400">
-            <strong>Note:</strong> Database and models are stored together in your application data directory for unified management.
-          </p>
         </div>
       </div>
 
-      {/* Analytics Section */}
       <div className="bg-card rounded-lg border border-border p-6 shadow-sm">
-        <AnalyticsConsentSwitch />
+        <h3 className="text-lg font-semibold text-foreground mb-1">Notes location</h3>
+        <p className="text-sm text-muted-foreground mb-4">
+          Where Nota saves your notes
+        </p>
+        <div className="font-mono text-xs text-muted-foreground break-all mb-4">
+          {notesLocation}
+        </div>
+        <button
+          onClick={handleSelectLocation}
+          disabled={isSelectingLocation}
+          className="px-3 py-1.5 text-xs font-medium text-foreground bg-secondary rounded-md hover:bg-secondary/80 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-secondary disabled:opacity-50 disabled:cursor-not-allowed"
+        >
+          {isSelectingLocation ? "Selecting..." : "Select new location"}
+        </button>
       </div>
     </div>
   )

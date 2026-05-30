@@ -7,8 +7,6 @@ import { Button } from '@/components/ui/button';
 import { Alert, AlertDescription } from '@/components/ui/alert';
 import { cn } from '@/lib/utils';
 import { Download, RefreshCw, BadgeAlert, Trash2 } from 'lucide-react';
-import { toast } from 'sonner';
-
 interface ModelInfo {
   name: string;
   display_name: string;
@@ -56,7 +54,6 @@ export function BuiltInModelManager({ selectedModel, onModelSelect }: BuiltInMod
       }
     } catch (error) {
       console.error('Failed to fetch built-in AI models:', error);
-      toast.error('Failed to load models');
     } finally {
       setIsLoading(false);
       setHasFetched(true);
@@ -121,7 +118,6 @@ export function BuiltInModelManager({ selectedModel, onModelSelect }: BuiltInMod
           });
           // Refresh models list
           fetchModels();
-          toast.success(`Model ${model} downloaded successfully`);
         }
 
         // Handle cancelled status
@@ -209,9 +205,7 @@ export function BuiltInModelManager({ selectedModel, onModelSelect }: BuiltInMod
         return;
       }
 
-      // For real errors, show toast and remove from downloading
-      toast.error(`Failed to download ${modelName}`);
-
+      // Remove from downloading
       setDownloadingModels((prev) => {
         const newSet = new Set(prev);
         newSet.delete(modelName);
@@ -226,7 +220,6 @@ export function BuiltInModelManager({ selectedModel, onModelSelect }: BuiltInMod
   const cancelDownload = async (modelName: string) => {
     try {
       await invoke('builtin_ai_cancel_download', { modelName });
-      toast.info(`Download of ${modelName} cancelled`);
       setDownloadingModels((prev) => {
         const newSet = new Set(prev);
         newSet.delete(modelName);
@@ -240,11 +233,9 @@ export function BuiltInModelManager({ selectedModel, onModelSelect }: BuiltInMod
   const deleteModel = async (modelName: string) => {
     try {
       await invoke('builtin_ai_delete_model', { modelName });
-      toast.success(`Model ${modelName} deleted`);
       fetchModels();
     } catch (error) {
       console.error('Failed to delete model:', error);
-      toast.error(`Failed to delete ${modelName}`);
     }
   };
 
@@ -271,10 +262,6 @@ export function BuiltInModelManager({ selectedModel, onModelSelect }: BuiltInMod
 
   return (
     <div>
-      <div className="flex items-center justify-between mb-4">
-        <h4 className="text-sm font-bold">Built-in AI Models</h4>
-      </div>
-
       <div className="grid gap-4">
         {models.map((model) => {
           const progress = downloadProgress[model.name];
@@ -289,14 +276,13 @@ export function BuiltInModelManager({ selectedModel, onModelSelect }: BuiltInMod
             <div
               key={model.name}
               className={cn(
-                'p-4 rounded-lg border transition-colors',
-                modelIsDownloading
-                  ? 'bg-card border-border'
-                  : 'bg-card',
-                selectedModel === model.name
-                  ? 'ring-2 ring-foreground border-foreground'
-                  : 'border-border hover:border-muted-foreground',
-                isAvailable && !modelIsDownloading && 'cursor-pointer'
+                'p-4 rounded-lg border-2 transition-all',
+                isAvailable && !modelIsDownloading ? 'cursor-pointer' : 'cursor-default',
+                selectedModel === model.name && isAvailable
+                  ? 'border-blue-500 bg-blue-500/10'
+                  : isAvailable
+                    ? 'border-border hover:border-muted-foreground bg-card'
+                    : 'border-border bg-muted/50'
               )}
               onClick={() => {
                 if (isAvailable && !modelIsDownloading) {

@@ -18,7 +18,7 @@ const TABS = [
   { value: 'general', label: 'General', icon: Settings2 },
   { value: 'recording', label: 'Listening', icon: Mic },
   { value: 'Transcriptionmodels', label: 'Transcription', icon: DatabaseIcon },
-  { value: 'summaryModels', label: 'Summary', icon: SparkleIcon },
+  { value: 'summaryModels', label: 'Analysis', icon: SparkleIcon },
   { value: 'beta', label: 'Beta', icon: FlaskConical },
 ] as const;
 

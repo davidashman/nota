@@ -1,6 +1,5 @@
 import { useState, useEffect, useCallback } from 'react';
 import { listen } from '@tauri-apps/api/event';
-import { toast } from 'sonner';
 import { TranscriptModelProps } from '@/components/TranscriptSettings';
 
 export type ModalType =
@@ -139,12 +138,6 @@ export function useModalState(transcriptModelConfig?: TranscriptModelProps): Use
           if (actionable) {
             // This is a model-related error that requires user action
             showModal('modelSelector', userMessage);
-          } else {
-            // Show toast instead of modal for non-actionable errors (consistent with sidebar)
-            toast.error('', {
-              description: userMessage,
-              duration: 5000,
-            });
           }
         });
         console.log('Transcription error listener setup complete');
@@ -175,7 +168,6 @@ export function useModalState(transcriptModelConfig?: TranscriptModelProps): Use
 
         // Auto-close modal if the downloaded model matches the selected one
         if (transcriptModelConfig?.provider === 'localWhisper' && transcriptModelConfig?.model === modelName) {
-          toast.success('Model ready! Closing window...', { duration: 1500 });
           setTimeout(() => hideModal('modelSelector'), 1500);
         }
       });

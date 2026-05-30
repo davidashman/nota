@@ -2,7 +2,6 @@
 
 import { useEffect, useState } from 'react';
 import { invoke } from '@tauri-apps/api/core';
-import { toast } from 'sonner';
 import { Database, AlertCircle, Loader2, CheckCircle2 } from 'lucide-react';
 
 interface HomebrewDatabaseDetectorProps {
@@ -61,15 +60,12 @@ export function HomebrewDatabaseDetector({ onImportSuccess, onDecline }: Homebre
         legacyDbPath: detectedPath,
       });
 
-      toast.success('Database imported successfully! Reloading...');
-
       // Wait 1 second for user to see success, then reload window to refresh all data
       setTimeout(() => {
         window.location.reload();
       }, 1000);
     } catch (error) {
       console.error('Error importing database:', error);
-      toast.error(`Import failed: ${error}`);
       setIsImporting(false);
     }
   };

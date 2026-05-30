@@ -2,8 +2,6 @@
 
 import React, { createContext, useContext, useState, useEffect } from 'react';
 import { listen } from '@tauri-apps/api/event';
-import { toast } from 'sonner';
-
 /**
  * Ollama download state synchronized with backend
  * This context provides persistent download state that survives component unmounts,
@@ -78,11 +76,6 @@ export function OllamaDownloadProvider({ children }: { children: React.ReactNode
             const { modelName } = event.payload;
             console.log(`✅ [OllamaDownloadContext] Download complete for ${modelName}`);
 
-            toast.success(`Model ${modelName} downloaded!`, {
-              description: 'Model is now ready to use',
-              duration: 4000
-            });
-
             // Clear progress and remove from downloading set
             setDownloadProgress(prev => {
               const newProgress = new Map(prev);
@@ -105,11 +98,6 @@ export function OllamaDownloadProvider({ children }: { children: React.ReactNode
           (event) => {
             const { modelName, error } = event.payload;
             console.error(`❌ [OllamaDownloadContext] Download error for ${modelName}:`, error);
-
-            toast.error(`Download failed: ${modelName}`, {
-              description: error,
-              duration: 6000
-            });
 
             // Clear progress and remove from downloading set
             setDownloadProgress(prev => {

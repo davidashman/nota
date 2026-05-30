@@ -2,7 +2,6 @@ import React, { useState, useEffect, useRef } from 'react';
 import { listen } from '@tauri-apps/api/event';
 import { invoke } from '@tauri-apps/api/core';
 import { motion, AnimatePresence } from 'framer-motion';
-import { toast } from 'sonner';
 import {
   ModelInfo,
   ModelStatus,
@@ -107,10 +106,6 @@ export function ModelManager({
       } catch (err) {
         console.error('Failed to initialize Whisper:', err);
         setError(err instanceof Error ? err.message : 'Failed to load models');
-        toast.error('Failed to load transcription models', {
-          description: err instanceof Error ? err.message : 'Unknown error',
-          duration: 5000
-        });
       } finally {
         setLoading(false);
       }
@@ -181,11 +176,6 @@ export function ModelManager({
           // Clean up throttle data
           progressThrottleRef.current.delete(modelName);
 
-          toast.success(`${getModelIcon(model?.accuracy || 'Good')} ${displayName} ready!`, {
-            description: 'Model downloaded and ready to use',
-            duration: 4000
-          });
-
           // Auto-select after download using stable refs
           if (onModelSelectRef.current) {
             onModelSelectRef.current(modelName);
@@ -219,15 +209,6 @@ export function ModelManager({
 
           // Clean up throttle data
           progressThrottleRef.current.delete(modelName);
-
-          toast.error(`Failed to download ${displayName}`, {
-            description: error,
-            duration: 6000,
-            action: {
-              label: 'Retry',
-              onClick: () => downloadModel(modelName)
-            }
-          });
         }
       );
     };
@@ -255,8 +236,6 @@ export function ModelManager({
   };
 
   const cancelDownload = async (modelName: string) => {
-    const displayName = getDisplayName(modelName);
-
     try {
       await WhisperAPI.cancelDownload(modelName);
 
@@ -276,23 +255,13 @@ export function ModelManager({
 
       // Clean up throttle data
       progressThrottleRef.current.delete(modelName);
-
-      toast.info(`${displayName} download cancelled`, {
-        duration: 3000
-      });
     } catch (err) {
       console.error('Failed to cancel download:', err);
-      toast.error('Failed to cancel download', {
-        description: err instanceof Error ? err.message : 'Unknown error',
-        duration: 4000
-      });
     }
   };
 
   const downloadModel = async (modelName: string) => {
     if (downloadingModels.has(modelName)) return;
-
-    const displayName = getDisplayName(modelName);
 
     try {
       updateDownloadingModels(prev => new Set([...prev, modelName]));
@@ -304,11 +273,6 @@ export function ModelManager({
             : model
         )
       );
-
-      toast.info(`Downloading ${displayName}...`, {
-        description: 'This may take a few minutes',
-        duration: 5000
-      });
 
       await WhisperAPI.downloadModel(modelName);
     } catch (err) {
@@ -339,15 +303,9 @@ export function ModelManager({
       await saveModelSelection(modelName);
     }
 
-    const displayName = getDisplayName(modelName);
-    toast.success(`Switched to ${displayName}`, {
-      duration: 3000
-    });
   };
 
   const deleteModel = async (modelName: string) => {
-    const displayName = getDisplayName(modelName);
-
     try {
       await WhisperAPI.deleteCorruptedModel(modelName);
 
@@ -355,21 +313,12 @@ export function ModelManager({
       const modelList = await WhisperAPI.getAvailableModels();
       setModels(modelList);
 
-      toast.success(`${displayName} deleted`, {
-        description: 'Model removed to free up space',
-        duration: 3000
-      });
-
       // If deleted model was selected, clear selection
       if (selectedModel === modelName && onModelSelect) {
         onModelSelect('');
       }
     } catch (err) {
       console.error('Failed to delete model:', err);
-      toast.error(`Failed to delete ${displayName}`, {
-        description: err instanceof Error ? err.message : 'Delete failed',
-        duration: 4000
-      });
     }
   };
 
@@ -561,15 +510,6 @@ function ModelCard({
               <h3 className="font-semibold text-foreground">{displayName}</h3>
               <span className="text-sm text-muted-foreground">•</span>
               <span className="text-sm text-muted-foreground">{getModelTagline(model.name, model.speed, model.accuracy)}</span>
-              {isSelected && isAvailable && (
-                <motion.span
-                  initial={{ scale: 0 }}
-                  animate={{ scale: 1 }}
-                  className="bg-blue-600 text-white px-2 py-0.5 rounded-full text-xs font-medium flex items-center gap-1"
-                >
-                  ✓
-                </motion.span>
-              )}
               {isQuantizedModel(model.name) && (
                 <span className={`px-2 py-0.5 rounded-full text-xs ${getModelPerformanceBadge(model.name).color === 'green'
                   ? 'bg-green-500/20 text-green-400'

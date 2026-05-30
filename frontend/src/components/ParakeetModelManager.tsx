@@ -2,7 +2,6 @@ import React, { useState, useEffect, useRef, useCallback } from 'react';
 import { listen } from '@tauri-apps/api/event';
 import { invoke } from '@tauri-apps/api/core';
 import { motion, AnimatePresence } from 'framer-motion';
-import { toast } from 'sonner';
 import {
   ParakeetModelInfo,
   ModelStatus,
@@ -59,10 +58,6 @@ export function ParakeetModelManager({
       } catch (err) {
         console.error('Failed to initialize Parakeet:', err);
         setError(err instanceof Error ? err.message : 'Failed to load models');
-        toast.error('Failed to load transcription models', {
-          description: err instanceof Error ? err.message : 'Unknown error',
-          duration: 5000
-        });
       } finally {
         setLoading(false);
       }
@@ -133,11 +128,6 @@ export function ParakeetModelManager({
           // Clean up throttle data
           progressThrottleRef.current.delete(modelName);
 
-          toast.success(`${displayInfo?.icon || '✓'} ${displayName} ready!`, {
-            description: 'Model downloaded and ready to use',
-            duration: 4000
-          });
-
           // Auto-select after download using stable refs
           if (onModelSelectRef.current) {
             onModelSelectRef.current(modelName);
@@ -172,15 +162,6 @@ export function ParakeetModelManager({
 
           // Clean up throttle data
           progressThrottleRef.current.delete(modelName);
-
-          toast.error(`Failed to download ${displayName}`, {
-            description: error,
-            duration: 6000,
-            action: {
-              label: 'Retry',
-              onClick: () => downloadModel(modelName)
-            }
-          });
         }
       );
     };
@@ -208,9 +189,6 @@ export function ParakeetModelManager({
   };
 
   const cancelDownload = async (modelName: string) => {
-    const displayInfo = getModelDisplayInfo(modelName);
-    const displayName = displayInfo?.friendlyName || modelName;
-
     try {
       await ParakeetAPI.cancelDownload(modelName);
 
@@ -230,24 +208,13 @@ export function ParakeetModelManager({
 
       // Clean up throttle data
       progressThrottleRef.current.delete(modelName);
-
-      toast.info(`${displayName} download cancelled`, {
-        duration: 3000
-      });
     } catch (err) {
       console.error('Failed to cancel download:', err);
-      toast.error('Failed to cancel download', {
-        description: err instanceof Error ? err.message : 'Unknown error',
-        duration: 4000
-      });
     }
   };
 
   const downloadModel = async (modelName: string) => {
     if (downloadingModels.has(modelName)) return;
-
-    const displayInfo = getModelDisplayInfo(modelName);
-    const displayName = displayInfo?.friendlyName || modelName;
 
     try {
       setDownloadingModels(prev => new Set([...prev, modelName]));
@@ -259,11 +226,6 @@ export function ParakeetModelManager({
             : model
         )
       );
-
-      toast.info(`Downloading ${displayName}...`, {
-        description: 'This may take a few minutes',
-        duration: 5000  // Auto-dismiss after 5 seconds
-      });
 
       await ParakeetAPI.downloadModel(modelName);
     } catch (err) {
@@ -291,18 +253,9 @@ export function ParakeetModelManager({
     if (autoSave) {
       await saveModelSelection(modelName);
     }
-
-    const displayInfo = getModelDisplayInfo(modelName);
-    const displayName = displayInfo?.friendlyName || modelName;
-    toast.success(`Switched to ${displayName}`, {
-      duration: 3000
-    });
   };
 
   const deleteModel = async (modelName: string) => {
-    const displayInfo = getModelDisplayInfo(modelName);
-    const displayName = displayInfo?.friendlyName || modelName;
-
     try {
       await ParakeetAPI.deleteCorruptedModel(modelName);
 
@@ -310,21 +263,12 @@ export function ParakeetModelManager({
       const modelList = await ParakeetAPI.getAvailableModels();
       setModels(modelList);
 
-      toast.success(`${displayName} deleted`, {
-        description: 'Model removed to free up space',
-        duration: 3000
-      });
-
       // If deleted model was selected, clear selection
       if (selectedModel === modelName && onModelSelect) {
         onModelSelect('');
       }
     } catch (err) {
       console.error('Failed to delete model:', err);
-      toast.error(`Failed to delete ${displayName}`, {
-        description: err instanceof Error ? err.message : 'Delete failed',
-        duration: 4000
-      });
     }
   };
 
@@ -484,15 +428,6 @@ function ModelCard({
             <div className="flex items-center gap-2 mb-1">
               <span className="text-2xl">{icon}</span>
               <h3 className="font-semibold text-foreground">{displayName}</h3>
-              {isSelected && isAvailable && (
-                <motion.span
-                  initial={{ scale: 0 }}
-                  animate={{ scale: 1 }}
-                  className="bg-blue-600 text-white px-2 py-0.5 rounded-full text-xs font-medium flex items-center gap-1"
-                >
-                  ✓
-                </motion.span>
-              )}
             </div>
 
             {/* Tagline */}

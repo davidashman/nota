@@ -5,9 +5,6 @@ import { Source_Sans_3 } from 'next/font/google'
 import Sidebar from '@/components/Sidebar'
 import { SidebarProvider, useSidebar } from '@/components/Sidebar/SidebarProvider'
 import MainContent from '@/components/MainContent'
-import AnalyticsProvider from '@/components/AnalyticsProvider'
-import { Toaster, toast } from 'sonner'
-import "sonner/dist/styles.css"
 import { useState, useEffect, useCallback } from 'react'
 import { listen, UnlistenFn } from '@tauri-apps/api/event'
 import { invoke } from '@tauri-apps/api/core'
@@ -19,7 +16,6 @@ import { ConfigProvider, useConfig } from '@/contexts/ConfigContext'
 import { OnboardingProvider } from '@/contexts/OnboardingContext'
 import { OnboardingFlow } from '@/components/onboarding'
 import { loadBetaFeatures } from '@/types/betaFeatures'
-import { DownloadProgressToastProvider } from '@/components/shared/DownloadProgressToast'
 import { UpdateCheckProvider } from '@/components/UpdateCheckProvider'
 import { RecordingPostProcessingProvider } from '@/contexts/RecordingPostProcessingProvider'
 import { ImportAudioDialog, ImportDropOverlay } from '@/components/ImportAudio'
@@ -92,18 +88,6 @@ function OverlayLayout({ children }: { children: React.ReactNode }) {
   )
 }
 
-function OffsetToaster() {
-  const { sidebarWidth } = useSidebar();
-  return (
-    <Toaster
-      position="bottom-center"
-      richColors
-      closeButton
-      style={{ left: `calc(50% + ${sidebarWidth / 2}px)` }}
-    />
-  );
-}
-
 // Full app layout with all providers and sidebar.
 function MainLayout({
   children,
@@ -153,11 +137,7 @@ function MainLayout({
     const unlisten = listen('request-recording-toggle', () => {
       console.log('[Layout] Received request-recording-toggle from tray');
 
-      if (showOnboarding) {
-        toast.error("Please complete setup first", {
-          description: "You need to finish onboarding before you can start recording."
-        });
-      } else {
+      if (!showOnboarding) {
         // If in main app, forward to useRecordingStart via window event
         console.log('[Layout] Forwarding to start-recording-from-sidebar');
         window.dispatchEvent(new CustomEvent('start-recording-from-sidebar'));
@@ -175,9 +155,6 @@ function MainLayout({
     const betaFeatures = loadBetaFeatures();
 
     if (!betaFeatures.importAndRetranscribe) {
-      toast.error('Beta feature disabled', {
-        description: 'Enable "Import Audio & Retranscribe" in Settings > Beta to use this feature.'
-      });
       return;
     }
 
@@ -191,10 +168,6 @@ function MainLayout({
       console.log('[Layout] Audio file dropped:', audioFile);
       setImportFilePath(audioFile);
       setShowImportDialog(true);
-    } else if (paths.length > 0) {
-      toast.error('Please drop an audio file', {
-        description: `Supported formats: ${getAudioFormatsDisplayList()}`
-      });
     }
   }, []);
 
@@ -276,7 +249,6 @@ function MainLayout({
     <html lang="en">
       <body className={`${sourceSans3.variable} font-sans antialiased`}>
         <ThemeProvider>
-        <AnalyticsProvider>
           <RecordingStateProvider>
             <TranscriptProvider>
               <ConfigProvider>
@@ -287,9 +259,6 @@ function MainLayout({
                         <TooltipProvider>
                           <RecordingPostProcessingProvider>
                             <ImportDialogProvider onOpen={handleOpenImportDialog}>
-                              {/* Download progress toast provider - listens for background downloads */}
-                              <DownloadProgressToastProvider />
-
                               {/* Show onboarding or main app */}
                               {showOnboarding ? (
                                 <OnboardingFlow onComplete={handleOnboardingComplete} />
@@ -309,7 +278,6 @@ function MainLayout({
                             </ImportDialogProvider>
                           </RecordingPostProcessingProvider>
                         </TooltipProvider>
-                        <OffsetToaster />
                       </SidebarProvider>
                     </UpdateCheckProvider>
                   </OnboardingProvider>
@@ -318,7 +286,6 @@ function MainLayout({
               </ConfigProvider>
             </TranscriptProvider>
           </RecordingStateProvider>
-        </AnalyticsProvider>
         </ThemeProvider>
       </body>
     </html>

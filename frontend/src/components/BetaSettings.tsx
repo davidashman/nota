@@ -1,9 +1,8 @@
 "use client"
 
 import { Switch } from "./ui/switch"
-import { FlaskConical, AlertCircle, Sun, Moon } from "lucide-react"
+import { FlaskConical, AlertCircle } from "lucide-react"
 import { useConfig } from "@/contexts/ConfigContext"
-import { useTheme } from "@/contexts/ThemeContext"
 import {
   BetaFeatureKey,
   BETA_FEATURE_NAMES,
@@ -12,7 +11,6 @@ import {
 
 export function BetaSettings() {
   const { betaFeatures, toggleBetaFeature } = useConfig();
-  const { theme, toggle: toggleTheme } = useTheme();
 
   // Define feature order for display (allows custom ordering)
   const featureOrder: BetaFeatureKey[] = ['importAndRetranscribe'];
@@ -27,27 +25,6 @@ export function BetaSettings() {
           <p className="mt-1">
             These features are still being tested. You may encounter issues, and we appreciate your feedback.
           </p>
-        </div>
-      </div>
-
-      {/* Appearance */}
-      <div className="bg-card rounded-lg border border-border p-6 shadow-sm">
-        <div className="flex items-center justify-between">
-          <div className="flex-1">
-            <div className="flex items-center gap-2 mb-2">
-              {theme === 'dark' ? <Moon className="h-5 w-5 text-muted-foreground" /> : <Sun className="h-5 w-5 text-muted-foreground" />}
-              <h3 className="text-lg font-semibold text-foreground">Dark Mode</h3>
-            </div>
-            <p className="text-sm text-muted-foreground">
-              Switch between light and dark appearance
-            </p>
-          </div>
-          <div className="ml-6">
-            <Switch
-              checked={theme === 'dark'}
-              onCheckedChange={() => toggleTheme()}
-            />
-          </div>
         </div>
       </div>
 

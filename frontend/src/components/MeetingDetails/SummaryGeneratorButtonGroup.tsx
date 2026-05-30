@@ -17,11 +17,8 @@ import {
   DropdownMenuTrigger,
 } from '@/components/ui/dropdown-menu';
 import { Sparkles, Settings, Loader2, FileText, Check, Square } from 'lucide-react';
-import Analytics from '@/lib/analytics';
 import { invoke } from '@tauri-apps/api/core';
-import { toast } from 'sonner';
 import { useState, useEffect, useRef } from 'react';
-import { isOllamaNotInstalledError } from '@/lib/utils';
 import { BuiltInModelInfo } from '@/lib/builtin-ai';
 
 interface SummaryGeneratorButtonGroupProps {
@@ -86,10 +83,6 @@ export function SummaryGeneratorButtonGroup({
 
       // Check if specific model is configured
       if (!selectedModel) {
-        toast.error('No built-in AI model selected', {
-          description: 'Please select a model in settings',
-          duration: 5000,
-        });
         setSettingsDialogOpen(true);
         return;
       }
@@ -112,10 +105,6 @@ export function SummaryGeneratorButtonGroup({
       });
 
       if (!modelInfo) {
-        toast.error('Model not found', {
-          description: `Could not find information for model: ${selectedModel}`,
-          duration: 5000,
-        });
         setSettingsDialogOpen(true);
         return;
       }
@@ -124,53 +113,29 @@ export function SummaryGeneratorButtonGroup({
       const status = modelInfo.status;
 
       if (status.type === 'downloading') {
-        toast.info('Model download in progress', {
-          description: `${selectedModel} is downloading (${status.progress}%). Please wait until download completes.`,
-          duration: 5000,
-        });
         return;
       }
 
       if (status.type === 'not_downloaded') {
-        toast.error('Model not downloaded', {
-          description: `${selectedModel} needs to be downloaded before use. Opening model settings...`,
-          duration: 5000,
-        });
         setSettingsDialogOpen(true);
         return;
       }
 
       if (status.type === 'corrupted') {
-        toast.error('Model file corrupted', {
-          description: `${selectedModel} file is corrupted. Please delete and re-download.`,
-          duration: 7000,
-        });
         setSettingsDialogOpen(true);
         return;
       }
 
       if (status.type === 'error') {
-        toast.error('Model error', {
-          description: status.Error || 'An error occurred with the model',
-          duration: 5000,
-        });
         setSettingsDialogOpen(true);
         return;
       }
 
       // Fallback
-      toast.error('Model not available', {
-        description: 'The selected model is not ready for use',
-        duration: 5000,
-      });
       setSettingsDialogOpen(true);
 
     } catch (error) {
       console.error('Error checking built-in AI models:', error);
-      toast.error('Failed to check model status', {
-        description: error instanceof Error ? error.message : String(error),
-        duration: 5000,
-      });
     } finally {
       setIsCheckingModels(false);
     }
@@ -196,10 +161,6 @@ export function SummaryGeneratorButtonGroup({
 
       if (!models || models.length === 0) {
         // No models available, show message and open settings
-        toast.error(
-          'No Ollama models found. Please download gemma2:2b from Model Settings.',
-          { duration: 5000 }
-        );
         setSettingsDialogOpen(true);
         return;
       }
@@ -208,28 +169,6 @@ export function SummaryGeneratorButtonGroup({
       onGenerateSummary(customPrompt);
     } catch (error) {
       console.error('Error checking Ollama models:', error);
-      const errorMessage = error instanceof Error ? error.message : String(error);
-
-      if (isOllamaNotInstalledError(errorMessage)) {
-        // Ollama is not installed - show specific message with download link
-        toast.error(
-          'Ollama is not installed',
-          {
-            description: 'Please download and install Ollama to use local models.',
-            duration: 7000,
-            action: {
-              label: 'Download',
-              onClick: () => invoke('open_external_url', { url: 'https://ollama.com/download' })
-            }
-          }
-        );
-      } else {
-        // Other error - generic message
-        toast.error(
-          'Failed to check Ollama models. Please check if Ollama is running and download a model.',
-          { duration: 5000 }
-        );
-      }
       setSettingsDialogOpen(true);
     } finally {
       setIsCheckingModels(false);
@@ -248,7 +187,6 @@ export function SummaryGeneratorButtonGroup({
           size="sm"
           className="bg-gradient-to-r from-red-50 to-orange-50 hover:from-red-100 hover:to-orange-100 border-red-200 dark:from-blue-950/60 dark:to-purple-950/60 dark:hover:from-blue-900/60 dark:hover:to-purple-900/60 dark:border-blue-800/50 rounded-r-none xl:px-4"
           onClick={() => {
-            Analytics.trackButtonClick('stop_summary_generation', 'meeting_details');
             onStopGeneration();
           }}
           title="Stop summary generation"
@@ -262,7 +200,6 @@ export function SummaryGeneratorButtonGroup({
           size="sm"
           className="bg-gradient-to-r from-blue-50 to-purple-50 hover:from-blue-100 hover:to-purple-100 border-blue-200 dark:from-blue-950/60 dark:to-purple-950/60 dark:hover:from-blue-900/60 dark:hover:to-purple-900/60 dark:border-blue-800/50 rounded-r-none xl:px-4"
           onClick={() => {
-            Analytics.trackButtonClick('generate_summary', 'meeting_details');
             checkOllamaModelsAndGenerate();
           }}
           disabled={isCheckingModels || isModelConfigLoading}

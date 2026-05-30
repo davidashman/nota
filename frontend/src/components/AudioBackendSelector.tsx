@@ -156,11 +156,6 @@ export function AudioBackendSelector({
                   <span className="text-sm font-medium text-foreground">
                     {backend.name}
                   </span>
-                  {currentBackend === backend.id && (
-                    <span className="text-xs font-medium text-blue-600 bg-blue-100 px-2 py-0.5 rounded">
-                      Active
-                    </span>
-                  )}
                   {isCoreAudio && (
                     <span className="text-xs font-medium text-muted-foreground bg-muted px-2 py-0.5 rounded">
                       Disabled
