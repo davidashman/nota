@@ -114,7 +114,7 @@ async fn start_recording<R: Runtime>(
             log_info!("Recording started successfully");
 
             // Show overlay in recording mode (creates it if not already open from auto-detect).
-            overlay::show_recording(&app, meeting_name.as_deref().unwrap_or("Listening"));
+            overlay::show_recording(&app, meeting_name.as_deref().unwrap_or("Transcribing"));
 
             Ok(())
         }
@@ -284,7 +284,7 @@ async fn start_recording_with_devices_and_meeting<R: Runtime>(
              mic_device_name, system_device_name, meeting_name);
 
     // Call the recording module functions that support meeting names
-    let display_name = meeting_name.clone().unwrap_or_else(|| "Listening".to_string());
+    let display_name = meeting_name.clone().unwrap_or_else(|| "Transcribing".to_string());
     let recording_result = match (mic_device_name.clone(), system_device_name.clone()) {
         (None, None) => {
             log_info!(
@@ -373,13 +373,13 @@ pub fn update_app_menu<R: Runtime>(_app: &AppHandle<R>) {
 
         if let Ok(guard) = FILE_MENU_TOGGLE.lock() {
             if let Some(item) = guard.as_ref() {
-                let _ = item.set_text(if is_rec { "Stop Listening" } else { "Start Listening" });
+                let _ = item.set_text(if is_rec { "Stop Transcribing" } else { "Start Transcribing" });
             }
         }
         if let Ok(guard) = FILE_MENU_PAUSE_RESUME.lock() {
             if let Some(item) = guard.as_ref() {
                 let _ = item.set_enabled(is_rec);
-                let _ = item.set_text(if is_paused { "Resume Listening" } else { "Pause Listening" });
+                let _ = item.set_text(if is_paused { "Resume Transcribing" } else { "Pause Transcribing" });
             }
         }
     });
@@ -437,10 +437,10 @@ pub fn run() {
 
                 // File menu — recording controls + Import Audio
                 let toggle_item =
-                    MenuItemBuilder::with_id("file_recording_toggle", "Start Listening")
+                    MenuItemBuilder::with_id("file_recording_toggle", "Start Transcribing")
                         .build(&h)?;
                 let pause_resume_item =
-                    MenuItemBuilder::with_id("file_pause_resume", "Pause Listening")
+                    MenuItemBuilder::with_id("file_pause_resume", "Pause Transcribing")
                         .enabled(false)
                         .build(&h)?;
                 *FILE_MENU_TOGGLE.lock().unwrap() = Some(toggle_item.clone());

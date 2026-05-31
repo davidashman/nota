@@ -40,7 +40,7 @@ export const RecordingStatusBar: React.FC<RecordingStatusBarProps> = ({ isPaused
     >
       <div className={`w-2 h-2 rounded-full ${isPaused ? 'bg-orange-500' : 'bg-blue-500 animate-pulse'}`} />
       <span className={`text-sm ${isPaused ? 'text-orange-400' : 'text-foreground'}`}>
-        {isPaused ? 'Paused' : 'Listening'} • {formatDuration(displaySeconds)}
+        {isPaused ? 'Paused' : 'Transcribing'} • {formatDuration(displaySeconds)}
       </span>
     </motion.div>
   );

@@ -115,7 +115,7 @@ const Sidebar: React.FC = () => {
 
   const fakeItemLabel =
     status === RecordingStatus.STARTING || status === RecordingStatus.RECORDING
-      ? 'Listening...'
+      ? 'Transcribing...'
       : 'Processing...';
 
   const isFakeItemActive = showFakeRecordingItem && pathname === '/';

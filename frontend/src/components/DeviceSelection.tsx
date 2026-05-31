@@ -172,7 +172,7 @@ export function DeviceSelection({ selectedDevices, onDeviceChange, disabled = fa
 
   if (loading) {
     return (
-      <div className="p-4 space-y-4">
+      <div className="p-4">
         <div className="animate-pulse">
           <div className="h-4 bg-muted rounded w-1/3 mb-4"></div>
           <div className="h-10 bg-muted rounded mb-3"></div>
@@ -183,27 +183,14 @@ export function DeviceSelection({ selectedDevices, onDeviceChange, disabled = fa
   }
 
   return (
-    <div className="space-y-4">
+    <div className="flex flex-col gap-4">
       <div className="flex items-center justify-between">
         <h3 className="text-lg font-semibold text-foreground">Audio Devices</h3>
-        <div className="flex items-center space-x-2">
-          {/* TODO: Monitoring */}
-          {/* <button */}
-          {/*   onClick={toggleAudioLevelMonitoring} */}
-          {/*   disabled={disabled || inputDevices.length === 0} */}
-          {/*   className={`px-3 py-1 text-xs font-medium rounded-md transition-colors ${ */}
-          {/*     isMonitoring */}
-          {/*       ? 'bg-red-100 text-red-700 hover:bg-red-200' */}
-          {/*       : 'bg-green-100 text-green-700 hover:bg-green-200' */}
-          {/*   } disabled:pointer-events-none disabled:opacity-50`} */}
-          {/*   title={inputDevices.length === 0 ? 'No microphones available to test' : ''} */}
-          {/* > */}
-          {/*   {isMonitoring ? 'Stop Test' : 'Test Mic'} */}
-          {/* </button> */}
+        <div className="flex items-center">
           <button
             onClick={handleRefresh}
             disabled={refreshing || disabled}
-            className="h-8 w-8 p-0 inline-flex items-center justify-center rounded-md text-sm font-medium transition-colors hover:bg-muted disabled:pointer-events-none disabled:opacity-50"
+            className="h-7 w-7 p-0 inline-flex items-center justify-center rounded-md text-sm font-medium transition-colors hover:bg-muted disabled:pointer-events-none disabled:opacity-50"
           >
             <RefreshCw className={`h-4 w-4 ${refreshing ? 'animate-spin' : ''}`} />
           </button>
@@ -216,9 +203,9 @@ export function DeviceSelection({ selectedDevices, onDeviceChange, disabled = fa
         </div>
       )}
 
-      <div className="space-y-3">
+      <div className="flex flex-col gap-3">
         {/* Microphone Selection */}
-        <div className="space-y-2">
+        <div className="flex flex-col gap-2">
           <div className="flex items-center gap-2">
             <Mic className="h-4 w-4 text-muted-foreground" />
             <Label htmlFor="mic-selection" className="text-sm font-medium text-foreground">
@@ -251,7 +238,7 @@ export function DeviceSelection({ selectedDevices, onDeviceChange, disabled = fa
 
           {/* Audio Level Meters for Input Devices */}
           {showLevels && inputDevices.length > 0 && (
-            <div className="space-y-2 pt-2 border-t border-border">
+            <div className="space-y-2 pt-3 pl-6 ml-2 border-l border-border">
               <p className="text-xs text-muted-foreground font-medium">Microphone Levels:</p>
               {inputDevices.map((device) => {
                 const levelData = audioLevels.get(device.name);
@@ -321,7 +308,7 @@ export function DeviceSelection({ selectedDevices, onDeviceChange, disabled = fa
 
           {/* Backend Selection - available on all platforms */}
           {!disabled && (
-            <div className="pt-3 border-t border-border">
+            <div className="pt-3 pl-6 ml-2 border-l border-border">
               <AudioBackendSelector disabled={disabled} />
             </div>
           )}
@@ -329,7 +316,7 @@ export function DeviceSelection({ selectedDevices, onDeviceChange, disabled = fa
       </div>
 
       {/* Info text */}
-      <div className="text-xs text-muted-foreground space-y-1">
+      {/* <div className="text-xs text-muted-foreground space-y-1">
         <p>• <strong>Microphone:</strong> Records your voice and ambient sound</p>
         <p>• <strong>System Audio:</strong> Records computer audio (music, calls, etc.)</p>
         {isMonitoring && (
@@ -338,7 +325,7 @@ export function DeviceSelection({ selectedDevices, onDeviceChange, disabled = fa
         {!isMonitoring && inputDevices.length > 0 && (
           <p>• <strong>Tip:</strong> Click "Test Mic" to check if your microphone is working</p>
         )}
-      </div>
+      </div> */}
     </div>
   );
 }

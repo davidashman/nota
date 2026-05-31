@@ -249,10 +249,10 @@ export const VirtualizedTranscriptView: React.FC<VirtualizedTranscriptViewProps>
                                 <div className={`w-3 h-3 rounded-full ${isPaused ? 'bg-orange-500' : 'bg-blue-500 animate-pulse'}`}></div>
                             </div>
                             <p className="text-sm text-gray-600">
-                                {isPaused ? 'Paused' : 'Listening for speech...'}
+                                {isPaused ? 'Paused' : 'Transcribing speech...'}
                             </p>
                             <p className="text-xs mt-1 text-gray-400">
-                                {isPaused ? 'Click resume to continue listening' : 'Speak to see live transcription'}
+                                {isPaused ? 'Click resume to continue transcribing' : 'Speak to see live transcription'}
                             </p>
                         </>
                     ) : (
@@ -326,7 +326,7 @@ export const VirtualizedTranscriptView: React.FC<VirtualizedTranscriptViewProps>
                         </div>
                     )}
 
-                    {/* Listening indicator when recording */}
+                    {/* Transcribing indicator when recording */}
                     {!isStopping && isRecording && !isPaused && !isProcessing && segments.length > 0 && (
                         <motion.div
                             initial={{ opacity: 0 }}
@@ -335,7 +335,7 @@ export const VirtualizedTranscriptView: React.FC<VirtualizedTranscriptViewProps>
                             className="flex items-center gap-2 mt-4 text-gray-500"
                         >
                             <div className="w-2 h-2 bg-blue-500 rounded-full animate-pulse"></div>
-                            <span className="text-sm">Listening...</span>
+                            <span className="text-sm">Transcribing...</span>
                         </motion.div>
                     )}
                 </>
@@ -382,7 +382,7 @@ export const VirtualizedTranscriptView: React.FC<VirtualizedTranscriptViewProps>
                         </div>
                     )}
 
-                    {/* Listening indicator when recording */}
+                    {/* Transcribing indicator when recording */}
                     {!isStopping && isRecording && !isPaused && !isProcessing && segments.length > 0 && (
                         <motion.div
                             initial={{ opacity: 0 }}
@@ -391,7 +391,7 @@ export const VirtualizedTranscriptView: React.FC<VirtualizedTranscriptViewProps>
                             className="flex items-center gap-2 mt-4 text-gray-500"
                         >
                             <div className="w-2 h-2 bg-blue-500 rounded-full animate-pulse"></div>
-                            <span className="text-sm">Listening...</span>
+                            <span className="text-sm">Transcribing...</span>
                         </motion.div>
                     )}
                 </>

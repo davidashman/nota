@@ -98,7 +98,7 @@ export function TranscriptPanel({
       {!isRecording && convertedSegments.length > 0 && (
         <div className="mx-3 my-6 border-t border-border">
           <textarea
-            placeholder="Add context for AI summary. For example people involved, meeting overview, objective etc..."
+            placeholder="Add context for AI analysis. For example people involved, meeting overview, objective etc..."
             className="w-full px-3 py-2 border border-border rounded-md text-md focus:outline-none focus:ring-1 focus:ring-blue-500 focus:border-blue-500 bg-background text-foreground shadow-sm min-h-[140px] resize-y"
             value={customPrompt}
             onChange={(e) => onPromptChange(e.target.value)}

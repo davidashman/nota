@@ -333,19 +333,19 @@ fn build_menu<R: Runtime>(
         match state {
             RecordingState::Stopped => {
                 builder = builder
-                    .item(&MenuItemBuilder::with_id("toggle_recording", "Start Listening").build(app)?);
+                    .item(&MenuItemBuilder::with_id("toggle_recording", "Start Transcribing").build(app)?);
             }
             RecordingState::Starting => {
                 builder = builder.item(
-                    &MenuItemBuilder::new("🔄 Starting Listening...")
+                    &MenuItemBuilder::new("🔄 Starting Transcribing...")
                         .enabled(false)
                         .build(app)?,
                 );
             }
             RecordingState::Recording => {
                 builder = builder
-                    .item(&MenuItemBuilder::with_id("pause_recording", "⏸ Pause Listening").build(app)?)
-                    .item(&MenuItemBuilder::with_id("stop_recording", "⏹ Stop Listening").build(app)?);
+                    .item(&MenuItemBuilder::with_id("pause_recording", "⏸ Pause Transcribing").build(app)?)
+                    .item(&MenuItemBuilder::with_id("stop_recording", "⏹ Stop Transcribing").build(app)?);
             }
             RecordingState::Pausing => {
                 builder = builder
@@ -354,15 +354,15 @@ fn build_menu<R: Runtime>(
                             .enabled(false)
                             .build(app)?,
                     )
-                    .item(&MenuItemBuilder::with_id("stop_recording", "⏹ Stop Listening").build(app)?);
+                    .item(&MenuItemBuilder::with_id("stop_recording", "⏹ Stop Transcribing").build(app)?);
             }
             RecordingState::Paused => {
                 builder = builder
                     .item(
-                        &MenuItemBuilder::with_id("resume_recording", "▶ Resume Listening")
+                        &MenuItemBuilder::with_id("resume_recording", "▶ Resume Transcribing")
                             .build(app)?,
                     )
-                    .item(&MenuItemBuilder::with_id("stop_recording", "⏹ Stop Listening").build(app)?);
+                    .item(&MenuItemBuilder::with_id("stop_recording", "⏹ Stop Transcribing").build(app)?);
             }
             RecordingState::Resuming => {
                 builder = builder
@@ -371,7 +371,7 @@ fn build_menu<R: Runtime>(
                             .enabled(false)
                             .build(app)?,
                     )
-                    .item(&MenuItemBuilder::with_id("stop_recording", "⏹ Stop Listening").build(app)?);
+                    .item(&MenuItemBuilder::with_id("stop_recording", "⏹ Stop Transcribing").build(app)?);
             }
             RecordingState::Stopping => {
                 builder = builder.item(

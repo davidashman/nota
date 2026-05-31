@@ -133,8 +133,8 @@ export const RecordingControls: React.FC<RecordingControlsProps> = ({
         });
       } else {
         setDeviceError({
-          title: 'Listening Failed',
-          message: 'Unable to start listening. Please check your audio device settings and try again.'
+          title: 'Transcribing Failed',
+          message: 'Unable to start transcribing. Please check your audio device settings and try again.'
         });
       }
     }
