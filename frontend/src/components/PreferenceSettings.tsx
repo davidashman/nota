@@ -34,8 +34,8 @@ export function PreferenceSettings() {
         <div className="flex items-center justify-between">
           <div className="flex-1">
             <div className="flex items-center gap-2 mb-1">
-              {theme === 'dark' ? <Moon className="h-5 w-5 text-muted-foreground" /> : <Sun className="h-5 w-5 text-muted-foreground" />}
               <h3 className="text-lg font-semibold text-foreground">Dark Mode</h3>
+              {theme === 'dark' ? <Moon className="h-5 w-5 text-muted-foreground" /> : <Sun className="h-5 w-5 text-muted-foreground" />}
             </div>
             <p className="text-sm text-muted-foreground">Switch between light and dark appearance</p>
           </div>

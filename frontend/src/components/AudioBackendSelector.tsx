@@ -169,7 +169,7 @@ export function AudioBackendSelector({
         })}
       </div>
 
-      <div className="text-xs text-muted-foreground00 space-y-1">
+      <div className="text-xs text-muted-foreground00 space-y-1 pt-1">
         <p>• Backend selection only affects system audio capture</p>
         <p>• Microphone always uses the default method</p>
         <p>• Changes apply to new recording sessions</p>
