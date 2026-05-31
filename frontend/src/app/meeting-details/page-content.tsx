@@ -183,7 +183,7 @@ export default function PageContent({
       className="flex flex-col h-screen bg-background"
     >
       {/* Tab bar */}
-      <div data-tauri-drag-region className="flex items-center justify-between border-b border-border shrink-0 ml-6">
+      <div data-tauri-drag-region className="flex items-center justify-between border-b border-border shrink-0 pl-6">
         <Tabs value={activeTab} onValueChange={(v) => setActiveTab(v as 'transcript' | 'summary' | 'analysis')}>
           <TabsList className="bg-transparent relative rounded-none p-0 h-auto">
             {TABS.map((tab, index) => (
